@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DIS_Semestralka_S2_Letisko.Letisko
 {
-    public class Letisko : Event_Core
+    public class LetiskoSimulation : Event_Core
     {
         protected override void AfterReplication()
         {
