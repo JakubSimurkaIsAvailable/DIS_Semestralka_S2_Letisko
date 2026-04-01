@@ -50,7 +50,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
             {
                 rontgen.JeVolnyPrepravka = false;
                 Prepravka prvaPrepravka = rontgen.PrepravkyPredRontgenom.Dequeue();
-                simulacia.ScheduleEvent(new EZacniRontgen(simulacia, prvaPrepravka, rontgen), cestujuci.CasNalozeniaPrepraviek);
+                simulacia.ScheduleEvent(new EZacniRontgen(simulacia, prvaPrepravka, rontgen, cestujuci.Rad), cestujuci.CasNalozeniaPrepraviek);
             }
 
             cestujuci.CasDovykladaniaPrepraviek = cestujuci.CasNalozeniaPrepraviek;

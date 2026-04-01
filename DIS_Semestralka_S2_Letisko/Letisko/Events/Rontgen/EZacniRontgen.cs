@@ -12,9 +12,11 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
     public class EZacniRontgen : EventPrepravka
     {
         private Objects.Rontgen Rontgen; 
-        public EZacniRontgen(LetiskoSimulation core, Prepravka actor, Objects.Rontgen rontgen) : base(core, actor)
+        private int Terminal;
+        public EZacniRontgen(LetiskoSimulation core, Prepravka actor, Objects.Rontgen rontgen, int terminal) : base(core, actor)
         {
             this.Rontgen = rontgen;
+            this.Terminal = terminal;
         }
 
         public override double Execute()
@@ -24,7 +26,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
 
             prepravka.CasZaciatkuRontgenu = simulacia.CurrentTime;
             double casKoncaRontgenu = simulacia.CurrentTime + simulacia.GeneratorRontgenPrepravky.Generate();
-            simulacia.ScheduleEvent(new ESkonciRontgen(simulacia, prepravka, Rontgen), casKoncaRontgenu);
+            simulacia.ScheduleEvent(new ESkonciRontgen(simulacia, prepravka, Rontgen, Terminal), casKoncaRontgenu);
             return simulacia.CurrentTime;
         }
     }
