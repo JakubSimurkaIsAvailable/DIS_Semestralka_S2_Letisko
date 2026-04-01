@@ -71,7 +71,15 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Zber
                     simulacia.ScheduleEvent(new EPrichodZberPrepraviek(simulacia, dalsiCestujuci), simulacia.CurrentTime);
                 } else
                 {
-                    simulacia.ZberPrepraviek1Volny = true;
+                    switch(cestujuci.Rad)
+                    {
+                        case 0:
+                            simulacia.ZberPrepraviek1Volny = true;
+                            break;
+                        case 1:
+                            simulacia.ZberPrepraviek2Volny = true;
+                            break;
+                    }
                 }
 
             }
