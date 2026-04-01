@@ -18,10 +18,8 @@ namespace DIS_Semestralka_S2_Letisko.Simulation.Event_Based
 
         public override double Execute()
         {
-
             Thread.Sleep(_length);
-            
-            return Core.CurrentTime + _length;
+            return Core.CurrentTime;
         }
     }
 }
