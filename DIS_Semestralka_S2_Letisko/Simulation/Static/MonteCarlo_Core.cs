@@ -19,7 +19,7 @@ namespace DIS_Semestralka_S2_Letisko.Simulation.Static
             Run = true;
             currentReplication = 1;
             BeforeSimulation();
-            while (currentReplication < replicationCount && Run == true)
+            while (currentReplication <= replicationCount && Run == true)
             {
                 BeforeReplication();
                 DoReplication();
