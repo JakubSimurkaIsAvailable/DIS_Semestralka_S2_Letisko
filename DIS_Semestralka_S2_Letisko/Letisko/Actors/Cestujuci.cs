@@ -14,18 +14,17 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Actors
         public double CasDovykladaniaPrepraviek { get; set; }
         public double CasNalozeniaPrepraviek { get; set; }
         public int Rad { get; private set; }
-        public int MaxPocetPrepraviek { get; private set; }
+        public int MaxPocetPrepraviek { get; set; }
         public int AktualnyPocetPrepraviek { get; set; }
         public int ID { get; private set; }
         public double OsobnaPrehliadka { get; set; }
 
         public Cestujuci(double casPrichodu, int ID)
         {
+            this.ID = ID;
             CasPrichodu = casPrichodu;
             CasPrichoduPriRontgen = -1;
             Rad = -1;
-
-
         }
         public int VyberRad(int[] dlzkyRadov, Random generatorGeneratorov)
         {
