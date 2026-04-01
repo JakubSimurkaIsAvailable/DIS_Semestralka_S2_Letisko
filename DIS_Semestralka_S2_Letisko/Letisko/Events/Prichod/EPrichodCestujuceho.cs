@@ -21,6 +21,9 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Arrival
             LetiskoSimulation simulacia = (LetiskoSimulation)Core;
             Cestujuci cestujuci = (Cestujuci)Actor;
             simulacia.PocetCestujucich++;
+            int pocetPrepraviek = (int)simulacia.GeneratorPercentTable.Generate();
+            cestujuci.MaxPocetPrepraviek = pocetPrepraviek;
+            cestujuci.AktualnyPocetPrepraviek = pocetPrepraviek;
             double nasledujuciPrichod = simulacia.GeneratorPrichodov.Generate();
             nasledujuciPrichod += simulacia.CurrentTime;
             simulacia.ScheduleEvent(new EPrichodCestujuceho(simulacia, new Cestujuci(nasledujuciPrichod, simulacia.PocetCestujucich)), nasledujuciPrichod);
