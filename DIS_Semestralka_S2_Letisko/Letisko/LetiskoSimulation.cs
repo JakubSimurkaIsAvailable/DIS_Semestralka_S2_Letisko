@@ -58,12 +58,14 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             RadPredDetektorom1 = new Queue<Cestujuci>();
             Detektor1 = new DetektorKovu();
             RadPredZberomPrepraviek1 = new Queue<Cestujuci>();
+            ZberPrepraviek1Volny = true;
             //---------------------- Terminal 2 -----------------
             RadPredRontgenom2 = new Queue<Cestujuci>();
             Rontgen2 = new Rontgen(4, 5);
             RadPredDetektorom2 = new Queue<Cestujuci>();
             Detektor2 = new DetektorKovu();
             RadPredZberomPrepraviek2 = new Queue<Cestujuci>();
+            ZberPrepraviek2Volny = true;
             TimeLimit = 60 * 60 * 24; //60 sekund * 60 minut * 24 hodin = 1 den
 
         }
