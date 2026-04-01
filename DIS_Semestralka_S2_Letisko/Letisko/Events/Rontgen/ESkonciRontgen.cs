@@ -58,10 +58,20 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
             {
                 Rontgen.JeVolnyPrepravka = true;
             }
-            
+
+            // belt before scanner freed one slot — unblock a waiting passenger if any
+            Queue<Cestujuci> radPredRontgenom = Terminal == 0 ? simulacia.RadPredRontgenom1 : simulacia.RadPredRontgenom2;
+            if (!Rontgen.JeVolnyCestujuci && radPredRontgenom.Count > 0 && radPredRontgenom.Peek().AktualnyPocetPrepraviek > 0)
+            {
+                simulacia.ScheduleEvent(new ENalozeniePrepravkyNaPas(simulacia, radPredRontgenom.Peek()), simulacia.CurrentTime);
+            }
+
             if(!zberVolny)
             {
-                simulacia.ScheduleEvent(new EZberPrepravky(simulacia, radPredZberom.Peek()), simulacia.CurrentTime);
+                Cestujuci c;
+                radPredZberom.TryPeek(out c);
+                if (c != null)
+                    simulacia.ScheduleEvent(new EZberPrepravky(simulacia, c), simulacia.CurrentTime);
             }
 
             return simulacia.CurrentTime;
