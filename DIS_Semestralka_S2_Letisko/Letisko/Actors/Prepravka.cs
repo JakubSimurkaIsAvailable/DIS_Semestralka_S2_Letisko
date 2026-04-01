@@ -19,6 +19,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Actors
         public Prepravka(int ID_cestujuci, int prepravkaCislo)
         {
             ID_Cestujuci = ID_cestujuci;
+            ID = prepravkaCislo;
         }
     }
 }
