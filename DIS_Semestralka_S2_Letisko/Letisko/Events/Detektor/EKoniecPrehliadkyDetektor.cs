@@ -62,7 +62,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
                 {
                     detektor.JeVolny = true;
                 }
-                if (cestujuci.AktualnyPocetPrepraviek > 0)
+                if (cestujuci.MaxPocetPrepraviek > 0)
                 {
                     radPredZberomPrepraviek.Enqueue(cestujuci);
                     if (zberPrepraviekVolny)
