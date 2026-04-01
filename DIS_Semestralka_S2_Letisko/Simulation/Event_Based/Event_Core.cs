@@ -18,6 +18,11 @@ namespace DIS_Semestralka_S2_Letisko.Simulation.Event_Based
         public double Rate { get; set; }
         public bool EarlyStop { get; set; }
         private List<ISimDelegate> Delegates { get; set; }
+
+        protected Event_Core()
+        {
+            Delegates = new List<ISimDelegate>();
+        }
         protected override void DoReplication()
         {
             while (EventQueue.Count > 0 && CurrentTime < TimeLimit && Run)
@@ -26,10 +31,12 @@ namespace DIS_Semestralka_S2_Letisko.Simulation.Event_Based
                 {
                     Thread.Sleep(100);
                 }
-                Event e = EventQueue.Dequeue();
-                CurrentTime = e.Execute();
+                EventQueue.TryDequeue(out Event e, out double scheduledTime);
+                CurrentTime = scheduledTime;
+                e.Execute();
                 if(Slowdown && e is SleepEvent)
                 {
+                    RefreshGUI();
                     ScheduleEvent(new SleepEvent(this, Length), CurrentTime + Length * Rate);
                 }
             }
@@ -43,7 +50,8 @@ namespace DIS_Semestralka_S2_Letisko.Simulation.Event_Based
 
         public void ScheduleEvent(Event e, double time)
         {
-            EventQueue.Enqueue(e, time);
+            if(time >= CurrentTime)
+                EventQueue.Enqueue(e, time);
         }
         public void RegisterDelegate(ISimDelegate simDelegate)
         {
