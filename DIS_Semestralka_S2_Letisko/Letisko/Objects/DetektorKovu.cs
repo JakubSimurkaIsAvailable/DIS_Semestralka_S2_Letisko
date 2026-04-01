@@ -8,5 +8,10 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Objects
 {
     public class DetektorKovu
     {
+        public bool JeVolny { get; set; }
+        public DetektorKovu()
+        {
+            JeVolny = true;
+        }
     }
 }
