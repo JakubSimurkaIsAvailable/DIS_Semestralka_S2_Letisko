@@ -29,6 +29,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
         public Queue<Cestujuci> RadPredDetektorom1 { get; private set; }
         public DetektorKovu Detektor1 { get; private set; }
         public Queue<Cestujuci> RadPredZberomPrepraviek1 { get; private set; }
+        public bool ZberPrepraviek1Volny { get; set; }
 
         // ------------------------------
 
@@ -38,6 +39,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
         public Queue<Cestujuci> RadPredDetektorom2 { get; private set; }
         public DetektorKovu Detektor2 { get; private set; }
         public Queue<Cestujuci> RadPredZberomPrepraviek2 { get; private set; }
+        public bool ZberPrepraviek2Volny { get; set; }
         // ------------------------------
         public LetiskoSimulation()
         {
