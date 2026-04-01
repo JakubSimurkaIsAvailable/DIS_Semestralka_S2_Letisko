@@ -131,11 +131,19 @@ namespace MainForm
 
             UpdateTerminal(
                 lstQueue1, lblRontgenCestujuci1Value, lblRontgenPrepravka1Value, lstPasPred1, lstPasZa1,
-                _sim.RadPredRontgenom1, _sim.Rontgen1);
+                lblDetektor1Value, lstRadDetektor1,
+                lblZber1Value, lstRadZber1,
+                _sim.RadPredRontgenom1, _sim.Rontgen1,
+                _sim.Detektor1, _sim.RadPredDetektorom1,
+                _sim.ZberPrepraviek1Volny, _sim.RadPredZberomPrepraviek1);
 
             UpdateTerminal(
                 lstQueue2, lblRontgenCestujuci2Value, lblRontgenPrepravka2Value, lstPasPred2, lstPasZa2,
-                _sim.RadPredRontgenom2, _sim.Rontgen2);
+                lblDetektor2Value, lstRadDetektor2,
+                lblZber2Value, lstRadZber2,
+                _sim.RadPredRontgenom2, _sim.Rontgen2,
+                _sim.Detektor2, _sim.RadPredDetektorom2,
+                _sim.ZberPrepraviek2Volny, _sim.RadPredZberomPrepraviek2);
         }
 
         private static void UpdateTerminal(
@@ -144,8 +152,16 @@ namespace MainForm
             Label lblRontgenPrepravkaValue,
             ListBox lstPasPred,
             ListBox lstPasZa,
+            Label lblDetektorValue,
+            ListBox lstRadDetektor,
+            Label lblZberValue,
+            ListBox lstRadZber,
             Queue<Cestujuci> rad,
-            Rontgen rontgen)
+            Rontgen rontgen,
+            DetektorKovu detektor,
+            Queue<Cestujuci> radDetektor,
+            bool zberVolny,
+            Queue<Cestujuci> radZber)
         {
             FillListBox(lstQueue, SafeToArray(rad), c => $"ID {c.ID}");
 
@@ -157,6 +173,16 @@ namespace MainForm
 
             FillListBox(lstPasPred, SafeToArray(rontgen.PrepravkyPredRontgenom), p => $"ID {p.ID}  (ces. {p.ID_Cestujuci})");
             FillListBox(lstPasZa,   SafeToArray(rontgen.PrepravkyZaRontgenom),   p => $"ID {p.ID}  (ces. {p.ID_Cestujuci})");
+
+            lblDetektorValue.Text = detektor.JeVolny ? "Voľný" : "Zaneprázdnený";
+            lblDetektorValue.ForeColor = detektor.JeVolny ? Color.Green : Color.Red;
+
+            FillListBox(lstRadDetektor, SafeToArray(radDetektor), c => $"ID {c.ID}");
+
+            lblZberValue.Text = zberVolny ? "Voľný" : "Zaneprázdnený";
+            lblZberValue.ForeColor = zberVolny ? Color.Green : Color.Red;
+
+            FillListBox(lstRadZber, SafeToArray(radZber), c => $"ID {c.ID}");
         }
 
         private static void FillListBox<T>(ListBox lb, T[] items, Func<T, string> format)

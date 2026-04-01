@@ -15,55 +15,100 @@ namespace MainForm
 
         private void InitializeComponent()
         {
-            btnStart = new Button();
-            btnPause = new Button();
-            btnStop = new Button();
+            // ── Buttons ──────────────────────────────────────────────────────
+            btnStart  = new Button();
+            btnPause  = new Button();
+            btnStop   = new Button();
 
-            grpSpeed = new GroupBox();
-            chkMaxSpeed = new CheckBox();
+            // ── Speed group ───────────────────────────────────────────────────
+            grpSpeed      = new GroupBox();
+            chkMaxSpeed   = new CheckBox();
             lblSleepTitle = new Label();
-            sldSleep = new TrackBar();
+            sldSleep      = new TrackBar();
             lblSleepValue = new Label();
-            lblStepTitle = new Label();
-            sldStep = new TrackBar();
-            lblStepValue = new Label();
+            lblStepTitle  = new Label();
+            sldStep       = new TrackBar();
+            lblStepValue  = new Label();
 
-            lblTerminal1Header = new Label();
-            lblQueue1Title = new Label();
-            lblQueue1Value = new Label();
-            lblTerminal2Header = new Label();
-            lblQueue2Title = new Label();
-            lblQueue2Value = new Label();
+            // ── Global info ───────────────────────────────────────────────────
+            lblSimTimeTitle = new Label();
+            lblSimTimeValue = new Label();
+            lblPocetTitle   = new Label();
+            lblPocetValue   = new Label();
+
+            // ── Terminal 1 ────────────────────────────────────────────────────
+            grpTerminal1                = new GroupBox();
+            lblRontgenCestujuci1Title   = new Label();
+            lblRontgenCestujuci1Value   = new Label();
+            lblRontgenPrepravka1Title   = new Label();
+            lblRontgenPrepravka1Value   = new Label();
+            lblQueue1Title              = new Label();
+            lstQueue1                   = new ListBox();
+            lblPasPred1Title            = new Label();
+            lstPasPred1                 = new ListBox();
+            lblPasZa1Title              = new Label();
+            lstPasZa1                   = new ListBox();
+            lblDetektor1Title           = new Label();
+            lblDetektor1Value           = new Label();
+            lblRadDetektor1Title        = new Label();
+            lstRadDetektor1             = new ListBox();
+            lblZber1Title               = new Label();
+            lblZber1Value               = new Label();
+            lblRadZber1Title            = new Label();
+            lstRadZber1                 = new ListBox();
+
+            // ── Terminal 2 ────────────────────────────────────────────────────
+            grpTerminal2                = new GroupBox();
+            lblRontgenCestujuci2Title   = new Label();
+            lblRontgenCestujuci2Value   = new Label();
+            lblRontgenPrepravka2Title   = new Label();
+            lblRontgenPrepravka2Value   = new Label();
+            lblQueue2Title              = new Label();
+            lstQueue2                   = new ListBox();
+            lblPasPred2Title            = new Label();
+            lstPasPred2                 = new ListBox();
+            lblPasZa2Title              = new Label();
+            lstPasZa2                   = new ListBox();
+            lblDetektor2Title           = new Label();
+            lblDetektor2Value           = new Label();
+            lblRadDetektor2Title        = new Label();
+            lstRadDetektor2             = new ListBox();
+            lblZber2Title               = new Label();
+            lblZber2Value               = new Label();
+            lblRadZber2Title            = new Label();
+            lstRadZber2                 = new ListBox();
 
             grpSpeed.SuspendLayout();
+            grpTerminal1.SuspendLayout();
+            grpTerminal2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)sldSleep).BeginInit();
             ((System.ComponentModel.ISupportInitialize)sldStep).BeginInit();
             SuspendLayout();
 
-            // btnStart
-            btnStart.Location = new System.Drawing.Point(15, 15);
-            btnStart.Size = new System.Drawing.Size(90, 32);
-            btnStart.Text = "Start";
-            btnStart.Click += btnStart_Click;
+            // ── btnStart ──────────────────────────────────────────────────────
+            btnStart.Location = new Point(15, 15);
+            btnStart.Size     = new Size(90, 32);
+            btnStart.Text     = "Start";
+            btnStart.Click   += btnStart_Click;
 
-            // btnPause
-            btnPause.Location = new System.Drawing.Point(115, 15);
-            btnPause.Size = new System.Drawing.Size(90, 32);
-            btnPause.Text = "Pause";
-            btnPause.Enabled = false;
-            btnPause.Click += btnPause_Click;
+            // ── btnPause ──────────────────────────────────────────────────────
+            btnPause.Location = new Point(115, 15);
+            btnPause.Size     = new Size(90, 32);
+            btnPause.Text     = "Pause";
+            btnPause.Enabled  = false;
+            btnPause.Click   += btnPause_Click;
 
-            // btnStop
-            btnStop.Location = new System.Drawing.Point(215, 15);
-            btnStop.Size = new System.Drawing.Size(90, 32);
-            btnStop.Text = "Stop";
-            btnStop.Enabled = false;
-            btnStop.Click += btnStop_Click;
+            // ── btnStop ───────────────────────────────────────────────────────
+            btnStop.Location = new Point(215, 15);
+            btnStop.Size     = new Size(90, 32);
+            btnStop.Text     = "Stop";
+            btnStop.Enabled  = false;
+            btnStop.Click   += btnStop_Click;
 
-            // grpSpeed
-            grpSpeed.Location = new System.Drawing.Point(15, 60);
-            grpSpeed.Size = new System.Drawing.Size(490, 140);
-            grpSpeed.Text = "Rýchlosť simulácie";
+            // ── grpSpeed ──────────────────────────────────────────────────────
+            grpSpeed.Location = new Point(15, 60);
+            grpSpeed.Size     = new Size(600, 140);
+            grpSpeed.Text     = "Rýchlosť simulácie";
             grpSpeed.Controls.Add(chkMaxSpeed);
             grpSpeed.Controls.Add(lblSleepTitle);
             grpSpeed.Controls.Add(sldSleep);
@@ -73,105 +118,344 @@ namespace MainForm
             grpSpeed.Controls.Add(lblStepValue);
 
             // chkMaxSpeed
-            chkMaxSpeed.Location = new System.Drawing.Point(12, 22);
-            chkMaxSpeed.Size = new System.Drawing.Size(120, 22);
-            chkMaxSpeed.Text = "Max rýchlosť";
-            chkMaxSpeed.Checked = true;
+            chkMaxSpeed.Location       = new Point(12, 22);
+            chkMaxSpeed.Size           = new Size(120, 22);
+            chkMaxSpeed.Text           = "Max rýchlosť";
+            chkMaxSpeed.Checked        = true;
             chkMaxSpeed.CheckedChanged += chkMaxSpeed_CheckedChanged;
 
             // lblSleepTitle
-            lblSleepTitle.Location = new System.Drawing.Point(12, 55);
-            lblSleepTitle.Size = new System.Drawing.Size(130, 20);
-            lblSleepTitle.Text = "Trvanie pauzy (ms):";
+            lblSleepTitle.Location = new Point(12, 55);
+            lblSleepTitle.Size     = new Size(130, 20);
+            lblSleepTitle.Text     = "Trvanie pauzy (ms):";
 
             // sldSleep
-            sldSleep.Location = new System.Drawing.Point(150, 50);
-            sldSleep.Size = new System.Drawing.Size(270, 30);
-            sldSleep.Minimum = 10;
-            sldSleep.Maximum = 2000;
-            sldSleep.Value = 200;
+            sldSleep.Location      = new Point(150, 50);
+            sldSleep.Size          = new Size(380, 30);
+            sldSleep.Minimum       = 10;
+            sldSleep.Maximum       = 2000;
+            sldSleep.Value         = 200;
             sldSleep.TickFrequency = 100;
-            sldSleep.Enabled = false;
-            sldSleep.Scroll += sldSleep_Scroll;
+            sldSleep.Enabled       = false;
+            sldSleep.Scroll       += sldSleep_Scroll;
 
             // lblSleepValue
-            lblSleepValue.Location = new System.Drawing.Point(428, 55);
-            lblSleepValue.Size = new System.Drawing.Size(55, 20);
-            lblSleepValue.Text = "200 ms";
+            lblSleepValue.Location = new Point(538, 55);
+            lblSleepValue.Size     = new Size(55, 20);
+            lblSleepValue.Text     = "200 ms";
 
             // lblStepTitle
-            lblStepTitle.Location = new System.Drawing.Point(12, 100);
-            lblStepTitle.Size = new System.Drawing.Size(130, 20);
-            lblStepTitle.Text = "Krok simulácie:";
+            lblStepTitle.Location = new Point(12, 100);
+            lblStepTitle.Size     = new Size(130, 20);
+            lblStepTitle.Text     = "Krok simulácie:";
 
             // sldStep
-            sldStep.Location = new System.Drawing.Point(150, 95);
-            sldStep.Size = new System.Drawing.Size(270, 30);
-            sldStep.Minimum = 1;
-            sldStep.Maximum = 500;
-            sldStep.Value = 5;
+            sldStep.Location      = new Point(150, 95);
+            sldStep.Size          = new Size(380, 30);
+            sldStep.Minimum       = 1;
+            sldStep.Maximum       = 500;
+            sldStep.Value         = 5;
             sldStep.TickFrequency = 25;
-            sldStep.Enabled = false;
-            sldStep.Scroll += sldStep_Scroll;
+            sldStep.Enabled       = false;
+            sldStep.Scroll       += sldStep_Scroll;
 
             // lblStepValue
-            lblStepValue.Location = new System.Drawing.Point(428, 100);
-            lblStepValue.Size = new System.Drawing.Size(55, 20);
-            lblStepValue.Text = "5";
+            lblStepValue.Location = new Point(538, 100);
+            lblStepValue.Size     = new Size(55, 20);
+            lblStepValue.Text     = "5";
 
-            // lblTerminal1Header
-            lblTerminal1Header.Location = new System.Drawing.Point(15, 220);
-            lblTerminal1Header.Size = new System.Drawing.Size(490, 22);
-            lblTerminal1Header.Text = "Terminál 1";
-            lblTerminal1Header.Font = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
+            // ── Global info row ───────────────────────────────────────────────
+            var boldNormal = new Font("Segoe UI", 9.5f, FontStyle.Bold);
+            var plainNormal = new Font("Segoe UI", 9.5f);
 
-            // lblQueue1Title
-            lblQueue1Title.Location = new System.Drawing.Point(15, 247);
-            lblQueue1Title.Size = new System.Drawing.Size(250, 22);
-            lblQueue1Title.Text = "Rad pred Rontgenom:";
-            lblQueue1Title.Font = new System.Drawing.Font("Segoe UI", 10);
+            lblSimTimeTitle.Location = new Point(15, 213);
+            lblSimTimeTitle.Size     = new Size(105, 22);
+            lblSimTimeTitle.Text     = "Čas simulácie:";
+            lblSimTimeTitle.Font     = boldNormal;
 
-            // lblQueue1Value
-            lblQueue1Value.Location = new System.Drawing.Point(270, 247);
-            lblQueue1Value.Size = new System.Drawing.Size(80, 22);
-            lblQueue1Value.Text = "0";
-            lblQueue1Value.Font = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
-            lblQueue1Value.ForeColor = System.Drawing.Color.DarkBlue;
+            lblSimTimeValue.Location = new Point(125, 213);
+            lblSimTimeValue.Size     = new Size(120, 22);
+            lblSimTimeValue.Text     = "00:00:00";
+            lblSimTimeValue.Font     = plainNormal;
 
-            // lblTerminal2Header
-            lblTerminal2Header.Location = new System.Drawing.Point(15, 282);
-            lblTerminal2Header.Size = new System.Drawing.Size(490, 22);
-            lblTerminal2Header.Text = "Terminál 2";
-            lblTerminal2Header.Font = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
+            lblPocetTitle.Location = new Point(285, 213);
+            lblPocetTitle.Size     = new Size(165, 22);
+            lblPocetTitle.Text     = "Počet cestujúcich:";
+            lblPocetTitle.Font     = boldNormal;
 
-            // lblQueue2Title
-            lblQueue2Title.Location = new System.Drawing.Point(15, 309);
-            lblQueue2Title.Size = new System.Drawing.Size(250, 22);
-            lblQueue2Title.Text = "Rad pred Rontgenom:";
-            lblQueue2Title.Font = new System.Drawing.Font("Segoe UI", 10);
+            lblPocetValue.Location = new Point(455, 213);
+            lblPocetValue.Size     = new Size(80, 22);
+            lblPocetValue.Text     = "0";
+            lblPocetValue.Font     = plainNormal;
 
-            // lblQueue2Value
-            lblQueue2Value.Location = new System.Drawing.Point(270, 309);
-            lblQueue2Value.Size = new System.Drawing.Size(80, 22);
-            lblQueue2Value.Text = "0";
-            lblQueue2Value.Font = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
-            lblQueue2Value.ForeColor = System.Drawing.Color.DarkBlue;
+            // ── Helper fonts for inner controls ───────────────────────────────
+            var fTitle  = new Font("Segoe UI", 9f, FontStyle.Regular);
+            var fStatus = new Font("Segoe UI", 9f, FontStyle.Bold);
+            var fMono   = new Font("Consolas", 8.5f);
 
-            // Form1
-            ClientSize = new System.Drawing.Size(520, 350);
-            Text = "Letisko Simulácia";
+            // ══════════════════════════════════════════════════════════════════
+            // ── Terminal 1 GroupBox ───────────────────────────────────────────
+            // ══════════════════════════════════════════════════════════════════
+            grpTerminal1.Location = new Point(10, 243);
+            grpTerminal1.Size     = new Size(520, 518);
+            grpTerminal1.Text     = "Terminál 1";
+            grpTerminal1.Font     = new Font("Segoe UI", 10f, FontStyle.Bold);
+
+            // Röntgen – cestujúci
+            lblRontgenCestujuci1Title.Location  = new Point(10, 26);
+            lblRontgenCestujuci1Title.Size       = new Size(175, 20);
+            lblRontgenCestujuci1Title.Text       = "Röntgen (ces.):";
+            lblRontgenCestujuci1Title.Font       = fTitle;
+
+            lblRontgenCestujuci1Value.Location   = new Point(190, 26);
+            lblRontgenCestujuci1Value.Size        = new Size(150, 20);
+            lblRontgenCestujuci1Value.Text        = "Voľný";
+            lblRontgenCestujuci1Value.Font        = fStatus;
+            lblRontgenCestujuci1Value.ForeColor   = Color.Green;
+
+            // Röntgen – prepravka
+            lblRontgenPrepravka1Title.Location   = new Point(10, 48);
+            lblRontgenPrepravka1Title.Size        = new Size(175, 20);
+            lblRontgenPrepravka1Title.Text        = "Röntgen (prep.):";
+            lblRontgenPrepravka1Title.Font        = fTitle;
+
+            lblRontgenPrepravka1Value.Location    = new Point(190, 48);
+            lblRontgenPrepravka1Value.Size         = new Size(150, 20);
+            lblRontgenPrepravka1Value.Text         = "Voľný";
+            lblRontgenPrepravka1Value.Font         = fStatus;
+            lblRontgenPrepravka1Value.ForeColor    = Color.Green;
+
+            // Queue before röntgen
+            lblQueue1Title.Location = new Point(10, 72);
+            lblQueue1Title.Size     = new Size(350, 18);
+            lblQueue1Title.Text     = "Rad pred röntgenom (ID cestujúci):";
+            lblQueue1Title.Font     = fTitle;
+
+            lstQueue1.Location     = new Point(10, 91);
+            lstQueue1.Size         = new Size(500, 56);
+            lstQueue1.Font         = fMono;
+
+            // Luggage before röntgen
+            lblPasPred1Title.Location = new Point(10, 153);
+            lblPasPred1Title.Size     = new Size(300, 18);
+            lblPasPred1Title.Text     = "Prepravky pred röntgenom:";
+            lblPasPred1Title.Font     = fTitle;
+
+            lstPasPred1.Location     = new Point(10, 172);
+            lstPasPred1.Size         = new Size(500, 46);
+            lstPasPred1.Font         = fMono;
+
+            // Luggage after röntgen
+            lblPasZa1Title.Location = new Point(10, 224);
+            lblPasZa1Title.Size     = new Size(300, 18);
+            lblPasZa1Title.Text     = "Prepravky za röntgenom:";
+            lblPasZa1Title.Font     = fTitle;
+
+            lstPasZa1.Location     = new Point(10, 243);
+            lstPasZa1.Size         = new Size(500, 46);
+            lstPasZa1.Font         = fMono;
+
+            // Metal detector
+            lblDetektor1Title.Location  = new Point(10, 297);
+            lblDetektor1Title.Size      = new Size(175, 20);
+            lblDetektor1Title.Text      = "Detektor kovu:";
+            lblDetektor1Title.Font      = fTitle;
+
+            lblDetektor1Value.Location  = new Point(190, 297);
+            lblDetektor1Value.Size      = new Size(150, 20);
+            lblDetektor1Value.Text      = "Voľný";
+            lblDetektor1Value.Font      = fStatus;
+            lblDetektor1Value.ForeColor = Color.Green;
+
+            lblRadDetektor1Title.Location = new Point(10, 321);
+            lblRadDetektor1Title.Size     = new Size(350, 18);
+            lblRadDetektor1Title.Text     = "Rad pred detektorom (ID cestujúci):";
+            lblRadDetektor1Title.Font     = fTitle;
+
+            lstRadDetektor1.Location     = new Point(10, 340);
+            lstRadDetektor1.Size         = new Size(500, 56);
+            lstRadDetektor1.Font         = fMono;
+
+            // Luggage collection
+            lblZber1Title.Location  = new Point(10, 403);
+            lblZber1Title.Size      = new Size(175, 20);
+            lblZber1Title.Text      = "Zber prepraviek:";
+            lblZber1Title.Font      = fTitle;
+
+            lblZber1Value.Location  = new Point(190, 403);
+            lblZber1Value.Size      = new Size(150, 20);
+            lblZber1Value.Text      = "Voľný";
+            lblZber1Value.Font      = fStatus;
+            lblZber1Value.ForeColor = Color.Green;
+
+            lblRadZber1Title.Location = new Point(10, 427);
+            lblRadZber1Title.Size     = new Size(300, 18);
+            lblRadZber1Title.Text     = "Rad pred zberom (ID cestujúci):";
+            lblRadZber1Title.Font     = fTitle;
+
+            lstRadZber1.Location     = new Point(10, 446);
+            lstRadZber1.Size         = new Size(500, 56);
+            lstRadZber1.Font         = fMono;
+
+            grpTerminal1.Controls.Add(lblRontgenCestujuci1Title);
+            grpTerminal1.Controls.Add(lblRontgenCestujuci1Value);
+            grpTerminal1.Controls.Add(lblRontgenPrepravka1Title);
+            grpTerminal1.Controls.Add(lblRontgenPrepravka1Value);
+            grpTerminal1.Controls.Add(lblQueue1Title);
+            grpTerminal1.Controls.Add(lstQueue1);
+            grpTerminal1.Controls.Add(lblPasPred1Title);
+            grpTerminal1.Controls.Add(lstPasPred1);
+            grpTerminal1.Controls.Add(lblPasZa1Title);
+            grpTerminal1.Controls.Add(lstPasZa1);
+            grpTerminal1.Controls.Add(lblDetektor1Title);
+            grpTerminal1.Controls.Add(lblDetektor1Value);
+            grpTerminal1.Controls.Add(lblRadDetektor1Title);
+            grpTerminal1.Controls.Add(lstRadDetektor1);
+            grpTerminal1.Controls.Add(lblZber1Title);
+            grpTerminal1.Controls.Add(lblZber1Value);
+            grpTerminal1.Controls.Add(lblRadZber1Title);
+            grpTerminal1.Controls.Add(lstRadZber1);
+
+            // ══════════════════════════════════════════════════════════════════
+            // ── Terminal 2 GroupBox ───────────────────────────────────────────
+            // ══════════════════════════════════════════════════════════════════
+            grpTerminal2.Location = new Point(540, 243);
+            grpTerminal2.Size     = new Size(520, 518);
+            grpTerminal2.Text     = "Terminál 2";
+            grpTerminal2.Font     = new Font("Segoe UI", 10f, FontStyle.Bold);
+
+            // Röntgen – cestujúci
+            lblRontgenCestujuci2Title.Location  = new Point(10, 26);
+            lblRontgenCestujuci2Title.Size       = new Size(175, 20);
+            lblRontgenCestujuci2Title.Text       = "Röntgen (ces.):";
+            lblRontgenCestujuci2Title.Font       = fTitle;
+
+            lblRontgenCestujuci2Value.Location   = new Point(190, 26);
+            lblRontgenCestujuci2Value.Size        = new Size(150, 20);
+            lblRontgenCestujuci2Value.Text        = "Voľný";
+            lblRontgenCestujuci2Value.Font        = fStatus;
+            lblRontgenCestujuci2Value.ForeColor   = Color.Green;
+
+            // Röntgen – prepravka
+            lblRontgenPrepravka2Title.Location   = new Point(10, 48);
+            lblRontgenPrepravka2Title.Size        = new Size(175, 20);
+            lblRontgenPrepravka2Title.Text        = "Röntgen (prep.):";
+            lblRontgenPrepravka2Title.Font        = fTitle;
+
+            lblRontgenPrepravka2Value.Location    = new Point(190, 48);
+            lblRontgenPrepravka2Value.Size         = new Size(150, 20);
+            lblRontgenPrepravka2Value.Text         = "Voľný";
+            lblRontgenPrepravka2Value.Font         = fStatus;
+            lblRontgenPrepravka2Value.ForeColor    = Color.Green;
+
+            // Queue before röntgen
+            lblQueue2Title.Location = new Point(10, 72);
+            lblQueue2Title.Size     = new Size(350, 18);
+            lblQueue2Title.Text     = "Rad pred röntgenom (ID cestujúci):";
+            lblQueue2Title.Font     = fTitle;
+
+            lstQueue2.Location     = new Point(10, 91);
+            lstQueue2.Size         = new Size(500, 56);
+            lstQueue2.Font         = fMono;
+
+            // Luggage before röntgen
+            lblPasPred2Title.Location = new Point(10, 153);
+            lblPasPred2Title.Size     = new Size(300, 18);
+            lblPasPred2Title.Text     = "Prepravky pred röntgenom:";
+            lblPasPred2Title.Font     = fTitle;
+
+            lstPasPred2.Location     = new Point(10, 172);
+            lstPasPred2.Size         = new Size(500, 46);
+            lstPasPred2.Font         = fMono;
+
+            // Luggage after röntgen
+            lblPasZa2Title.Location = new Point(10, 224);
+            lblPasZa2Title.Size     = new Size(300, 18);
+            lblPasZa2Title.Text     = "Prepravky za röntgenom:";
+            lblPasZa2Title.Font     = fTitle;
+
+            lstPasZa2.Location     = new Point(10, 243);
+            lstPasZa2.Size         = new Size(500, 46);
+            lstPasZa2.Font         = fMono;
+
+            // Metal detector
+            lblDetektor2Title.Location  = new Point(10, 297);
+            lblDetektor2Title.Size      = new Size(175, 20);
+            lblDetektor2Title.Text      = "Detektor kovu:";
+            lblDetektor2Title.Font      = fTitle;
+
+            lblDetektor2Value.Location  = new Point(190, 297);
+            lblDetektor2Value.Size      = new Size(150, 20);
+            lblDetektor2Value.Text      = "Voľný";
+            lblDetektor2Value.Font      = fStatus;
+            lblDetektor2Value.ForeColor = Color.Green;
+
+            lblRadDetektor2Title.Location = new Point(10, 321);
+            lblRadDetektor2Title.Size     = new Size(350, 18);
+            lblRadDetektor2Title.Text     = "Rad pred detektorom (ID cestujúci):";
+            lblRadDetektor2Title.Font     = fTitle;
+
+            lstRadDetektor2.Location     = new Point(10, 340);
+            lstRadDetektor2.Size         = new Size(500, 56);
+            lstRadDetektor2.Font         = fMono;
+
+            // Luggage collection
+            lblZber2Title.Location  = new Point(10, 403);
+            lblZber2Title.Size      = new Size(175, 20);
+            lblZber2Title.Text      = "Zber prepraviek:";
+            lblZber2Title.Font      = fTitle;
+
+            lblZber2Value.Location  = new Point(190, 403);
+            lblZber2Value.Size      = new Size(150, 20);
+            lblZber2Value.Text      = "Voľný";
+            lblZber2Value.Font      = fStatus;
+            lblZber2Value.ForeColor = Color.Green;
+
+            lblRadZber2Title.Location = new Point(10, 427);
+            lblRadZber2Title.Size     = new Size(300, 18);
+            lblRadZber2Title.Text     = "Rad pred zberom (ID cestujúci):";
+            lblRadZber2Title.Font     = fTitle;
+
+            lstRadZber2.Location     = new Point(10, 446);
+            lstRadZber2.Size         = new Size(500, 56);
+            lstRadZber2.Font         = fMono;
+
+            grpTerminal2.Controls.Add(lblRontgenCestujuci2Title);
+            grpTerminal2.Controls.Add(lblRontgenCestujuci2Value);
+            grpTerminal2.Controls.Add(lblRontgenPrepravka2Title);
+            grpTerminal2.Controls.Add(lblRontgenPrepravka2Value);
+            grpTerminal2.Controls.Add(lblQueue2Title);
+            grpTerminal2.Controls.Add(lstQueue2);
+            grpTerminal2.Controls.Add(lblPasPred2Title);
+            grpTerminal2.Controls.Add(lstPasPred2);
+            grpTerminal2.Controls.Add(lblPasZa2Title);
+            grpTerminal2.Controls.Add(lstPasZa2);
+            grpTerminal2.Controls.Add(lblDetektor2Title);
+            grpTerminal2.Controls.Add(lblDetektor2Value);
+            grpTerminal2.Controls.Add(lblRadDetektor2Title);
+            grpTerminal2.Controls.Add(lstRadDetektor2);
+            grpTerminal2.Controls.Add(lblZber2Title);
+            grpTerminal2.Controls.Add(lblZber2Value);
+            grpTerminal2.Controls.Add(lblRadZber2Title);
+            grpTerminal2.Controls.Add(lstRadZber2);
+
+            // ── Form ──────────────────────────────────────────────────────────
+            ClientSize = new Size(1072, 773);
+            Text       = "Letisko Simulácia";
             Controls.Add(btnStart);
             Controls.Add(btnPause);
             Controls.Add(btnStop);
             Controls.Add(grpSpeed);
-            Controls.Add(lblTerminal1Header);
-            Controls.Add(lblQueue1Title);
-            Controls.Add(lblQueue1Value);
-            Controls.Add(lblTerminal2Header);
-            Controls.Add(lblQueue2Title);
-            Controls.Add(lblQueue2Value);
+            Controls.Add(lblSimTimeTitle);
+            Controls.Add(lblSimTimeValue);
+            Controls.Add(lblPocetTitle);
+            Controls.Add(lblPocetValue);
+            Controls.Add(grpTerminal1);
+            Controls.Add(grpTerminal2);
 
             grpSpeed.ResumeLayout(false);
+            grpTerminal1.ResumeLayout(false);
+            grpTerminal2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)sldSleep).EndInit();
             ((System.ComponentModel.ISupportInitialize)sldStep).EndInit();
             ResumeLayout(false);
@@ -179,22 +463,64 @@ namespace MainForm
 
         #endregion
 
-        private Button btnStart;
-        private Button btnPause;
-        private Button btnStop;
-        private GroupBox grpSpeed;
-        private CheckBox chkMaxSpeed;
-        private Label lblSleepTitle;
-        private TrackBar sldSleep;
-        private Label lblSleepValue;
-        private Label lblStepTitle;
-        private TrackBar sldStep;
-        private Label lblStepValue;
-        private Label lblTerminal1Header;
-        private Label lblQueue1Title;
-        private Label lblQueue1Value;
-        private Label lblTerminal2Header;
-        private Label lblQueue2Title;
-        private Label lblQueue2Value;
+        // ── Control fields ────────────────────────────────────────────────────
+        private Button    btnStart;
+        private Button    btnPause;
+        private Button    btnStop;
+        private GroupBox  grpSpeed;
+        private CheckBox  chkMaxSpeed;
+        private Label     lblSleepTitle;
+        private TrackBar  sldSleep;
+        private Label     lblSleepValue;
+        private Label     lblStepTitle;
+        private TrackBar  sldStep;
+        private Label     lblStepValue;
+
+        private Label     lblSimTimeTitle;
+        private Label     lblSimTimeValue;
+        private Label     lblPocetTitle;
+        private Label     lblPocetValue;
+
+        // Terminal 1
+        private GroupBox  grpTerminal1;
+        private Label     lblRontgenCestujuci1Title;
+        private Label     lblRontgenCestujuci1Value;
+        private Label     lblRontgenPrepravka1Title;
+        private Label     lblRontgenPrepravka1Value;
+        private Label     lblQueue1Title;
+        private ListBox   lstQueue1;
+        private Label     lblPasPred1Title;
+        private ListBox   lstPasPred1;
+        private Label     lblPasZa1Title;
+        private ListBox   lstPasZa1;
+        private Label     lblDetektor1Title;
+        private Label     lblDetektor1Value;
+        private Label     lblRadDetektor1Title;
+        private ListBox   lstRadDetektor1;
+        private Label     lblZber1Title;
+        private Label     lblZber1Value;
+        private Label     lblRadZber1Title;
+        private ListBox   lstRadZber1;
+
+        // Terminal 2
+        private GroupBox  grpTerminal2;
+        private Label     lblRontgenCestujuci2Title;
+        private Label     lblRontgenCestujuci2Value;
+        private Label     lblRontgenPrepravka2Title;
+        private Label     lblRontgenPrepravka2Value;
+        private Label     lblQueue2Title;
+        private ListBox   lstQueue2;
+        private Label     lblPasPred2Title;
+        private ListBox   lstPasPred2;
+        private Label     lblPasZa2Title;
+        private ListBox   lstPasZa2;
+        private Label     lblDetektor2Title;
+        private Label     lblDetektor2Value;
+        private Label     lblRadDetektor2Title;
+        private ListBox   lstRadDetektor2;
+        private Label     lblZber2Title;
+        private Label     lblZber2Value;
+        private Label     lblRadZber2Title;
+        private ListBox   lstRadZber2;
     }
 }
