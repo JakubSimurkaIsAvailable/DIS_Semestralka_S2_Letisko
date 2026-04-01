@@ -1,4 +1,7 @@
-﻿using DIS_Semestralka_S2_Letisko.Simulation.Actors;
+﻿using DIS_Semestralka_S2_Letisko.Letisko.Actors;
+using DIS_Semestralka_S2_Letisko.Letisko.Events.Odchod;
+using DIS_Semestralka_S2_Letisko.Letisko.Objects;
+using DIS_Semestralka_S2_Letisko.Simulation.Actors;
 using DIS_Semestralka_S2_Letisko.Simulation.Event_Based;
 using System;
 using System.Collections.Generic;
@@ -8,15 +11,68 @@ using System.Threading.Tasks;
 
 namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
 {
-    public class EKoniecPrehliadkyDetektor : Event
+    public class EKoniecPrehliadkyDetektor : EventCestujuci
     {
-        public EKoniecPrehliadkyDetektor(Event_Core core, Actor actor) : base(core, actor)
+        public EKoniecPrehliadkyDetektor(LetiskoSimulation core, Cestujuci actor) : base(core, actor)
         {
         }
 
         public override double Execute()
         {
-            throw new NotImplementedException();
+            LetiskoSimulation simulacia = (LetiskoSimulation)Core;
+            Cestujuci cestujuci = (Cestujuci)Actor;
+            Queue<Cestujuci> radPredDetektorom;
+            DetektorKovu detektor;
+            Queue<Cestujuci> radPredZberomPrepraviek;
+            bool zberPrepraviekVolny;
+            switch (cestujuci.Rad)
+            {
+                case 0:
+                    radPredDetektorom = simulacia.RadPredDetektorom1;
+                    detektor = simulacia.Detektor1;
+                    radPredZberomPrepraviek = simulacia.RadPredZberomPrepraviek1;
+                    zberPrepraviekVolny = simulacia.ZberPrepraviek1Volny;
+                    break;
+                case 1:
+                    radPredDetektorom = simulacia.RadPredDetektorom2;
+                    detektor = simulacia.Detektor2;
+                    radPredZberomPrepraviek = simulacia.RadPredZberomPrepraviek2;
+                    zberPrepraviekVolny = simulacia.ZberPrepraviek2Volny;
+                    break;
+                default:
+                    throw new InvalidOperationException("Neplatny rad cestujuceho.");
+            }
+            var cestujuciKontrola = radPredDetektorom.Dequeue();
+            if (cestujuciKontrola.ID != cestujuci.ID)
+            {
+                throw new InvalidOperationException("Cestujuci na konci kontroly neni cestujuci na konci radu.");
+            }
+            if(cestujuci.OsobnaPrehliadka > 0.19)
+            {
+                simulacia.ScheduleEvent(new EZaciatokOsobnejPrehliadky(simulacia, cestujuci), simulacia.CurrentTime);
+            } else
+            {
+                if (radPredDetektorom.Count > 0)
+                {
+                    Cestujuci dalsiCestujuci = radPredDetektorom.Peek();
+                    detektor.JeVolny = false;
+                    simulacia.ScheduleEvent(new EZaciatokPrehliadkyDetektor(simulacia, dalsiCestujuci), simulacia.CurrentTime);
+                }
+                else
+                {
+                    detektor.JeVolny = true;
+                }
+                if (cestujuci.AktualnyPocetPrepraviek > 0)
+                {
+                    radPredZberomPrepraviek.Enqueue(cestujuci);
+                    if (zberPrepraviekVolny)
+                    {
+                        simulacia.ScheduleEvent(new EPrichodZberPrepraviek(simulacia, cestujuci), simulacia.CurrentTime);
+                    }
+                }
+            }
+            
+            return simulacia.CurrentTime;
         }
     }
 }

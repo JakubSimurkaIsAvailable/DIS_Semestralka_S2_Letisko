@@ -1,4 +1,5 @@
-﻿using DIS_Semestralka_S2_Letisko.Simulation.Actors;
+﻿using DIS_Semestralka_S2_Letisko.Letisko.Actors;
+using DIS_Semestralka_S2_Letisko.Simulation.Actors;
 using DIS_Semestralka_S2_Letisko.Simulation.Event_Based;
 using System;
 using System.Collections.Generic;
@@ -8,15 +9,19 @@ using System.Threading.Tasks;
 
 namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
 {
-    public class EZaciatokPrehliadkyDetektor : Event
+    public class EZaciatokPrehliadkyDetektor : EventCestujuci
     {
-        public EZaciatokPrehliadkyDetektor(Event_Core core, Actor actor) : base(core, actor)
+        public EZaciatokPrehliadkyDetektor(LetiskoSimulation core, Cestujuci actor) : base(core, actor)
         {
         }
 
         public override double Execute()
         {
-            throw new NotImplementedException();
+            LetiskoSimulation simulacia = (LetiskoSimulation)Core;
+            Cestujuci cestujuci = (Cestujuci)Actor;
+            double casPrehliadky = simulacia.GeneratorDetektor.Generate();
+            simulacia.ScheduleEvent(new EKoniecPrehliadkyDetektor(simulacia, cestujuci), casPrehliadky + simulacia.CurrentTime);
+            return simulacia.CurrentTime;
         }
     }
 }
