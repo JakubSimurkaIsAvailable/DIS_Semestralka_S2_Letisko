@@ -1,4 +1,6 @@
-﻿using DIS_Semestralka_S2_Letisko.Simulation.Actors;
+using DIS_Semestralka_S2_Letisko.Letisko.Actors;
+using DIS_Semestralka_S2_Letisko.Letisko.Events;
+using DIS_Semestralka_S2_Letisko.Simulation.Actors;
 using DIS_Semestralka_S2_Letisko.Simulation.Event_Based;
 using System;
 using System.Collections.Generic;
@@ -8,15 +10,47 @@ using System.Threading.Tasks;
 
 namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
 {
-    public class EOdchodCestujucehoRontgen : Event
+    public class EOdchodCestujucehoRontgen : EventCestujuci
     {
-        public EOdchodCestujucehoRontgen(Event_Core core, Actor actor) : base(core, actor)
+        public EOdchodCestujucehoRontgen(LetiskoSimulation core, Cestujuci actor) : base(core, actor)
         {
         }
 
         public override double Execute()
         {
-            throw new NotImplementedException();
+            LetiskoSimulation simulacia = (LetiskoSimulation)Core;
+            Cestujuci cestujuci = (Cestujuci)Actor;
+
+            Queue<Cestujuci> rad;
+            Objects.Rontgen rontgen;
+            switch (cestujuci.Rad)
+            {
+                case 0:
+                    rad = simulacia.RadPredRontgenom1;
+                    rontgen = simulacia.Rontgen1;
+                    break;
+                case 1:
+                    rad = simulacia.RadPredRontgenom2;
+                    rontgen = simulacia.Rontgen2;
+                    break;
+                default:
+                    throw new Exception("Neplatný rad cestujúceho.");
+            }
+
+            rad.Dequeue();
+
+            if (rad.Count > 0)
+            {
+                Cestujuci dalsiCestujuci = rad.Peek();
+                dalsiCestujuci.PrichodPriRontgen(simulacia.CurrentTime);
+                simulacia.ScheduleEvent(new EPrichodCestujucehoRontgen(simulacia, dalsiCestujuci), simulacia.CurrentTime);
+            }
+            else
+            {
+                rontgen.JeVolnyCestujuci = true;
+            }
+
+            return simulacia.CurrentTime;
         }
     }
 }
