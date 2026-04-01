@@ -30,11 +30,11 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
 
             switch(Terminal)
             {
-                case 1:
+                case 0:
                     radPredZberom = simulacia.RadPredZberomPrepraviek1;
                     zberVolny = simulacia.ZberPrepraviek1Volny;
                     break;
-                case 2:
+                case 1:
                     radPredZberom = simulacia.RadPredZberomPrepraviek2;
                     zberVolny = simulacia.ZberPrepraviek2Volny;
                     break;
