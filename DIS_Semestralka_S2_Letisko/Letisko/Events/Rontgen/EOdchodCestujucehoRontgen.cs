@@ -1,5 +1,6 @@
 using DIS_Semestralka_S2_Letisko.Letisko.Actors;
 using DIS_Semestralka_S2_Letisko.Letisko.Events;
+using DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor;
 using DIS_Semestralka_S2_Letisko.Simulation.Actors;
 using DIS_Semestralka_S2_Letisko.Simulation.Event_Based;
 using System;
@@ -23,15 +24,18 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
 
             Queue<Cestujuci> rad;
             Objects.Rontgen rontgen;
+            Queue<Cestujuci> radDetektor;
             switch (cestujuci.Rad)
             {
                 case 0:
                     rad = simulacia.RadPredRontgenom1;
                     rontgen = simulacia.Rontgen1;
+                    radDetektor = simulacia.RadPredDetektorom1;
                     break;
                 case 1:
                     rad = simulacia.RadPredRontgenom2;
                     rontgen = simulacia.Rontgen2;
+                    radDetektor = simulacia.RadPredDetektorom2;
                     break;
                 default:
                     throw new Exception("Neplatný rad cestujúceho.");
@@ -49,7 +53,13 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
             {
                 rontgen.JeVolnyCestujuci = true;
             }
+            int pocetPredDetektorom = radDetektor.Count;
+            if (pocetPredDetektorom == 0)
+            {
+                simulacia.ScheduleEvent(new EZaciatokPrehliadkyDetektor(simulacia, cestujuci), simulacia.CurrentTime);
+            }
 
+            radDetektor.Enqueue(cestujuci);
             return simulacia.CurrentTime;
         }
     }
