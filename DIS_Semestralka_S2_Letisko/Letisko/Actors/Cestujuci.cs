@@ -17,6 +17,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Actors
         public int MaxPocetPrepraviek { get; private set; }
         public int AktualnyPocetPrepraviek { get; set; }
         public int ID { get; private set; }
+        public double OsobnaPrehliadka { get; set; }
 
         public Cestujuci(double casPrichodu, int ID)
         {
