@@ -1,4 +1,4 @@
-﻿using DIS_Semestralka_S2_Letisko.Letisko.Actors;
+using DIS_Semestralka_S2_Letisko.Letisko.Actors;
 using DIS_Semestralka_S2_Letisko.Simulation.Actors;
 using DIS_Semestralka_S2_Letisko.Letisko.Objects;
 using DIS_Semestralka_S2_Letisko.Simulation.Event_Based;
@@ -31,7 +31,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
                     break;
             }
 
-            return cestujuci.CasNalozeniaPrepraviek;
+            return simulacia.CurrentTime;
         }
 
         private void VylozPrepravky(Cestujuci cestujuci, LetiskoSimulation simulacia, Objects.Rontgen rontgen)
@@ -39,22 +39,34 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
             int pocet = cestujuci.AktualnyPocetPrepraviek;
             for (int i = 0; i < pocet; i++)
             {
-                int idPrepravky = cestujuci.MaxPocetPrepraviek - cestujuci.AktualnyPocetPrepraviek + i + 1;
+                int alreadyPlaced = cestujuci.MaxPocetPrepraviek - cestujuci.AktualnyPocetPrepraviek;
+                int idPrepravky = alreadyPlaced + 1;
                 Prepravka prepravka = new Prepravka(cestujuci.ID, idPrepravky);
-                prepravka.CasUlozeniaNaPasPredRontgenom = cestujuci.CasNalozeniaPrepraviek;
-                rontgen.PridajPrepravku(prepravka);
+                prepravka.CasUlozeniaNaPasPredRontgenom = simulacia.CurrentTime;
+                if (rontgen.PridajPrepravku(prepravka))
+                {
+                    cestujuci.AktualnyPocetPrepraviek--;
+                }
+                else
+                {
+                    break; // belt full — passenger waits
+                }
             }
-            cestujuci.AktualnyPocetPrepraviek = 0;
 
             if (rontgen.JeVolnyPrepravka && rontgen.PocetPrepraviekPred > 0)
             {
                 rontgen.JeVolnyPrepravka = false;
-                Prepravka prvaPrepravka = rontgen.PrepravkyPredRontgenom.Dequeue();
-                simulacia.ScheduleEvent(new EZacniRontgen(simulacia, prvaPrepravka, rontgen, cestujuci.Rad), cestujuci.CasNalozeniaPrepraviek);
+                Prepravka prvaPrepravka = rontgen.PrepravkyPredRontgenom.Peek();
+                simulacia.ScheduleEvent(new EZacniRontgen(simulacia, prvaPrepravka, rontgen, cestujuci.Rad), simulacia.CurrentTime);
             }
 
-            cestujuci.CasDovykladaniaPrepraviek = cestujuci.CasNalozeniaPrepraviek;
-            simulacia.ScheduleEvent(new EOdchodCestujucehoRontgen(simulacia, cestujuci), cestujuci.CasDovykladaniaPrepraviek);
+            if (cestujuci.AktualnyPocetPrepraviek == 0)
+            {
+                cestujuci.CasDovykladaniaPrepraviek = simulacia.CurrentTime;
+                simulacia.ScheduleEvent(new EOdchodCestujucehoRontgen(simulacia, cestujuci), simulacia.CurrentTime);
+            }
+            // else: belt was full — passenger stays at head of RadPredRontgenom,
+            //       JeVolnyCestujuci stays false until ESkonciRontgen frees a slot
         }
     }
 }
