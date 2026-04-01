@@ -28,15 +28,13 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Zber
             switch (cestujuci.Rad)
             {
                 case 0:
-                    kontrola = simulacia.RadPredZberomPrepraviek1.Dequeue();
-                    simulacia.ZberPrepraviek1Volny = true;
+                    kontrola = simulacia.RadPredZberomPrepraviek1.Peek();
                     rontgen = simulacia.Rontgen1;
                     radPredZberomPrepraviek = simulacia.RadPredZberomPrepraviek1;
                     zberPrepraviekVolny = simulacia.ZberPrepraviek1Volny;
                     break;
                 case 1:
-                    kontrola = simulacia.RadPredZberomPrepraviek2.Dequeue();
-                    simulacia.ZberPrepraviek2Volny = true;
+                    kontrola = simulacia.RadPredZberomPrepraviek2.Peek();
                     rontgen = simulacia.Rontgen2;
                     radPredZberomPrepraviek = simulacia.RadPredZberomPrepraviek2;
                     zberPrepraviekVolny = simulacia.ZberPrepraviek2Volny;
@@ -50,9 +48,9 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Zber
             }
             for(int i = 0; i < cestujuci.MaxPocetPrepraviek; i++)
             {
-                
-                Prepravka p = rontgen.PrepravkyZaRontgenom.Peek();
-                if(p.ID_Cestujuci == cestujuci.ID)
+                Prepravka p;
+                rontgen.PrepravkyZaRontgenom.TryPeek(out p);
+                if(p is not null && p.ID_Cestujuci == cestujuci.ID)
                 {
                     rontgen.PrepravkyZaRontgenom.Dequeue();
                     cestujuci.AktualnyPocetPrepraviek++;
@@ -65,7 +63,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Zber
             }
             if(cestujuci.AktualnyPocetPrepraviek == cestujuci.MaxPocetPrepraviek )
             {
-                if(radPredZberomPrepraviek.Count > 0)
+                radPredZberomPrepraviek.Dequeue();
+                if (radPredZberomPrepraviek.Count > 0)
                 {
                     Cestujuci dalsiCestujuci = radPredZberomPrepraviek.Peek();
                     simulacia.ScheduleEvent(new EPrichodZberPrepraviek(simulacia, dalsiCestujuci), simulacia.CurrentTime);
