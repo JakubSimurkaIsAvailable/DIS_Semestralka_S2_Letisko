@@ -1,4 +1,7 @@
-﻿using DIS_Semestralka_S2_Letisko.Simulation.Actors;
+﻿using DIS_Semestralka_S2_Letisko.Letisko.Actors;
+using DIS_Semestralka_S2_Letisko.Letisko.Events.Odchod;
+using DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen;
+using DIS_Semestralka_S2_Letisko.Simulation.Actors;
 using DIS_Semestralka_S2_Letisko.Simulation.Event_Based;
 using System;
 using System.Collections.Generic;
@@ -8,15 +11,71 @@ using System.Threading.Tasks;
 
 namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Zber
 {
-    public class EZberPrepravky : Event
+    public class EZberPrepravky : EventCestujuci
     {
-        public EZberPrepravky(Event_Core core, Actor actor) : base(core, actor)
+        public EZberPrepravky(LetiskoSimulation core, Cestujuci actor) : base(core, actor)
         {
         }
 
         public override double Execute()
         {
-            throw new NotImplementedException();
+            LetiskoSimulation simulacia = (LetiskoSimulation)Core;
+            Cestujuci cestujuci = (Cestujuci)Actor;
+            Queue<Cestujuci> radPredZberomPrepraviek;
+            bool zberPrepraviekVolny;
+            Cestujuci kontrola;
+            Objects.Rontgen rontgen;
+            switch (cestujuci.Rad)
+            {
+                case 0:
+                    kontrola = simulacia.RadPredZberomPrepraviek1.Dequeue();
+                    simulacia.ZberPrepraviek1Volny = true;
+                    rontgen = simulacia.Rontgen1;
+                    radPredZberomPrepraviek = simulacia.RadPredZberomPrepraviek1;
+                    zberPrepraviekVolny = simulacia.ZberPrepraviek1Volny;
+                    break;
+                case 1:
+                    kontrola = simulacia.RadPredZberomPrepraviek2.Dequeue();
+                    simulacia.ZberPrepraviek2Volny = true;
+                    rontgen = simulacia.Rontgen2;
+                    radPredZberomPrepraviek = simulacia.RadPredZberomPrepraviek2;
+                    zberPrepraviekVolny = simulacia.ZberPrepraviek2Volny;
+                    break;
+                default:
+                    throw new Exception("Neplatný rad cestujícího.");
+            }
+            if(kontrola.ID != cestujuci.ID)
+            {
+                throw new Exception("Neplatny cestujuci na zbere prepraviek");
+            }
+            for(int i = 0; i < cestujuci.MaxPocetPrepraviek; i++)
+            {
+                
+                Prepravka p = rontgen.PrepravkyZaRontgenom.Peek();
+                if(p.ID_Cestujuci == cestujuci.ID)
+                {
+                    rontgen.PrepravkyZaRontgenom.Dequeue();
+                    cestujuci.AktualnyPocetPrepraviek++;
+                    if(rontgen.PrepravkyZaRontgenom.Count < rontgen.MaxAfter && rontgen.PrepravkyPredRontgenom.Count > 0 && rontgen.JeVolnyPrepravka)
+                    {
+                        Prepravka novaPrepravva = rontgen.PrepravkyPredRontgenom.Peek();
+                        simulacia.ScheduleEvent(new EZacniRontgen(simulacia, novaPrepravva, rontgen, cestujuci.Rad), simulacia.CurrentTime);
+                    }
+                }
+            }
+            if(cestujuci.AktualnyPocetPrepraviek == cestujuci.MaxPocetPrepraviek )
+            {
+                if(radPredZberomPrepraviek.Count > 0)
+                {
+                    Cestujuci dalsiCestujuci = radPredZberomPrepraviek.Peek();
+                    simulacia.ScheduleEvent(new EPrichodZberPrepraviek(simulacia, dalsiCestujuci), simulacia.CurrentTime);
+                } else
+                {
+                    simulacia.ZberPrepraviek1Volny = true;
+                }
+
+            }
+            return simulacia.CurrentTime;
         }
     }
 }
