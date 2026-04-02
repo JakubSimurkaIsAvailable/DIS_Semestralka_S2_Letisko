@@ -64,6 +64,12 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Zber
             if(cestujuci.AktualnyPocetPrepraviek == cestujuci.MaxPocetPrepraviek )
             {
                 radPredZberomPrepraviek.Dequeue();
+                if (cestujuci.Rad == 0)
+                    simulacia.PocetVRadePredZberom1.AddWeightedValue(radPredZberomPrepraviek.Count, simulacia.CurrentTime);
+                else
+                    simulacia.PocetVRadePredZberom2.AddWeightedValue(radPredZberomPrepraviek.Count, simulacia.CurrentTime);
+                simulacia.PocetVRadePredZberomSpolu.AddWeightedValue(simulacia.RadPredZberomPrepraviek1.Count + simulacia.RadPredZberomPrepraviek2.Count, simulacia.CurrentTime);
+                simulacia.CasVSystemeCollector.AddValue(simulacia.CurrentTime - cestujuci.CasPrichodu);
                 if (radPredZberomPrepraviek.Count > 0)
                 {
                     Cestujuci dalsiCestujuci = radPredZberomPrepraviek.Peek();

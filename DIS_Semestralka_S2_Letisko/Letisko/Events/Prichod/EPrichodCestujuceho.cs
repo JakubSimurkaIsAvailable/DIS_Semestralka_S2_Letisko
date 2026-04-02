@@ -37,6 +37,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Arrival
             {
                 case 0:
                     simulacia.RadPredRontgenom1.Enqueue(cestujuci);
+                    simulacia.PocetVRadePredRontgenom1.AddWeightedValue(simulacia.RadPredRontgenom1.Count, simulacia.CurrentTime);
+                    simulacia.PocetVRadePredRontgenomSpolu.AddWeightedValue(simulacia.RadPredRontgenom1.Count + simulacia.RadPredRontgenom2.Count, simulacia.CurrentTime);
                     if (simulacia.Rontgen1.JeVolnyCestujuci)
                     {
                         simulacia.Rontgen1.JeVolnyCestujuci = false;
@@ -46,6 +48,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Arrival
                     break;
                 case 1:
                     simulacia.RadPredRontgenom2.Enqueue(cestujuci);
+                    simulacia.PocetVRadePredRontgenom2.AddWeightedValue(simulacia.RadPredRontgenom2.Count, simulacia.CurrentTime);
+                    simulacia.PocetVRadePredRontgenomSpolu.AddWeightedValue(simulacia.RadPredRontgenom1.Count + simulacia.RadPredRontgenom2.Count, simulacia.CurrentTime);
                     if (simulacia.Rontgen2.JeVolnyCestujuci)
                     {
                         simulacia.Rontgen2.JeVolnyCestujuci = false;

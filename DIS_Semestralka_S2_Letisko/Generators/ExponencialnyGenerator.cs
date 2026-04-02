@@ -36,6 +36,7 @@ namespace DIS_Semestralka_S2_Letisko.Generators
         /// <returns>A random value following the exponential distribution with parameter lambda</returns>
         public double Generate()
         {
+            return _lambda;
             double u = 1.0 - _random.NextDouble();
             return -Math.Log(u) / _lambda;
         }

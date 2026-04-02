@@ -32,6 +32,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Actors
             {
                 throw new InvalidOperationException("Cestujuci uz si vybral rad.");
             }
+            Random ranPrehliadka = new Random(generatorGeneratorov.Next());
+            OsobnaPrehliadka = ranPrehliadka.NextDouble();
             int minDlzka = int.MaxValue;
             int indexMinDlzky = -1;
             for (int i = 0; i < dlzkyRadov.Length; i++)

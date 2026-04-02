@@ -54,6 +54,11 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
                 detektor.JeVolny = true;
             }
             radPredZberomPrepraviek.Enqueue(cestujuci);
+            if (cestujuci.Rad == 0)
+                simulacia.PocetVRadePredZberom1.AddWeightedValue(radPredZberomPrepraviek.Count, simulacia.CurrentTime);
+            else
+                simulacia.PocetVRadePredZberom2.AddWeightedValue(radPredZberomPrepraviek.Count, simulacia.CurrentTime);
+            simulacia.PocetVRadePredZberomSpolu.AddWeightedValue(simulacia.RadPredZberomPrepraviek1.Count + simulacia.RadPredZberomPrepraviek2.Count, simulacia.CurrentTime);
             if(zberPrepraviekVolny)
             {
                 simulacia.ScheduleEvent(new EPrichodZberPrepraviek(simulacia, cestujuci), simulacia.CurrentTime);

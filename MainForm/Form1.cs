@@ -144,6 +144,17 @@ namespace MainForm
                 _sim.RadPredRontgenom2, _sim.Rontgen2,
                 _sim.Detektor2, _sim.RadPredDetektorom2,
                 _sim.ZberPrepraviek2Volny, _sim.RadPredZberomPrepraviek2);
+
+            lblCasVSystemeValue.Text          = _sim.CasVSystemeCollector.Average.ToString("F2");
+            lblAvgRadRontgen1Value.Text       = _sim.PocetVRadePredRontgenom1.WeightedAverage.ToString("F4");
+            lblAvgRadRontgen2Value.Text       = _sim.PocetVRadePredRontgenom2.WeightedAverage.ToString("F4");
+            lblAvgRadDetektor1Value.Text      = _sim.PocetVRadePredDetektorom1.WeightedAverage.ToString("F4");
+            lblAvgRadDetektor2Value.Text      = _sim.PocetVRadePredDetektorom2.WeightedAverage.ToString("F4");
+            lblAvgRadZber1Value.Text          = _sim.PocetVRadePredZberom1.WeightedAverage.ToString("F4");
+            lblAvgRadZber2Value.Text          = _sim.PocetVRadePredZberom2.WeightedAverage.ToString("F4");
+            lblAvgRadRontgenSpoluValue.Text   = _sim.PocetVRadePredRontgenomSpolu.WeightedAverage.ToString("F4");
+            lblAvgRadDetektorSpoluValue.Text  = _sim.PocetVRadePredDetektoromSpolu.WeightedAverage.ToString("F4");
+            lblAvgRadZberSpoluValue.Text      = _sim.PocetVRadePredZberomSpolu.WeightedAverage.ToString("F4");
         }
 
         private static void UpdateTerminal(
