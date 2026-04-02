@@ -21,23 +21,23 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
         {
             LetiskoSimulation simulacia = (LetiskoSimulation)Core;
             Cestujuci cestujuci = (Cestujuci)Actor;
-            Queue<Cestujuci> radPredDetektorom;
             Queue<Cestujuci> radPredZberomPrepraviek;
-            DetektorKovu detektor;
             bool zberPrepraviekVolny;
+            Queue<Cestujuci> radPredDetektorom;
+            DetektorKovu detektor;
             switch (cestujuci.Rad)
             {
                 case 0:
-                    radPredDetektorom = simulacia.RadPredDetektorom1;
                     radPredZberomPrepraviek = simulacia.RadPredZberomPrepraviek1;
-                    detektor = simulacia.Detektor1;
                     zberPrepraviekVolny = simulacia.ZberPrepraviek1Volny;
+                    radPredDetektorom = simulacia.RadPredDetektorom1;
+                    detektor = simulacia.Detektor1;
                     break;
                 case 1:
-                    radPredDetektorom = simulacia.RadPredDetektorom2;
                     radPredZberomPrepraviek = simulacia.RadPredZberomPrepraviek2;
-                    detektor = simulacia.Detektor2;
                     zberPrepraviekVolny = simulacia.ZberPrepraviek2Volny;
+                    radPredDetektorom = simulacia.RadPredDetektorom2;
+                    detektor = simulacia.Detektor2;
                     break;
                 default:
                     throw new Exception("Neplatny rad cestujuceho.");
