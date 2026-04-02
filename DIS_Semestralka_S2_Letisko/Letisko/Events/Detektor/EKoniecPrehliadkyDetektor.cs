@@ -54,9 +54,12 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
             }
             if(cestujuci.OsobnaPrehliadka > 0.19)
             {
+                // Detektor zostava obsadeny pocas osobnej prehliadky
                 simulacia.ScheduleEvent(new EZaciatokOsobnejPrehliadky(simulacia, cestujuci), simulacia.CurrentTime);
-            } else
+            }
+            else
             {
+                // Detektor je volny pre dalsieho cestujuceho
                 if (radPredDetektorom.Count > 0)
                 {
                     Cestujuci dalsiCestujuci = radPredDetektorom.Peek();

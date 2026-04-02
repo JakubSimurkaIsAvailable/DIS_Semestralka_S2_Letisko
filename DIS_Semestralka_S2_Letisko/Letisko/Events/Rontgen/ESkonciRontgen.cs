@@ -49,7 +49,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
             prepravka.CasUkonceniaRontgenu = simulacia.CurrentTime;
             Rontgen.PrepravkyZaRontgenom.Enqueue(prepravka);
 
-            if (Rontgen.PocetPrepraviekPred > 0)
+            if (Rontgen.PocetPrepraviekPred > 0 && Rontgen.PocetPrepraviekZa < Rontgen.MaxAfter)
             {
                 Prepravka dalsiaPrepravka = Rontgen.PrepravkyPredRontgenom.Peek();
                 simulacia.ScheduleEvent(new EZacniRontgen(simulacia, dalsiaPrepravka, Rontgen, Terminal), simulacia.CurrentTime);

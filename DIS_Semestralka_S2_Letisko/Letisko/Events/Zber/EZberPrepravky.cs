@@ -56,6 +56,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Zber
                     cestujuci.AktualnyPocetPrepraviek++;
                     if(rontgen.PrepravkyZaRontgenom.Count < rontgen.MaxAfter && rontgen.PrepravkyPredRontgenom.Count > 0 && rontgen.JeVolnyPrepravka)
                     {
+                        rontgen.JeVolnyPrepravka = false;
                         Prepravka novaPrepravva = rontgen.PrepravkyPredRontgenom.Peek();
                         simulacia.ScheduleEvent(new EZacniRontgen(simulacia, novaPrepravva, rontgen, cestujuci.Rad), simulacia.CurrentTime);
                     }
