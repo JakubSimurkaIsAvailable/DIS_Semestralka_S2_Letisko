@@ -46,8 +46,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
             {
                 Cestujuci dalsiCestujuci = radPredDetektorom.Peek();
                 detektor.JeVolny = false;
-                EKoniecOsobnejPrehliadky eventKoniecOsobnejPrehliadky = new EKoniecOsobnejPrehliadky(simulacia, dalsiCestujuci);
-                simulacia.ScheduleEvent(eventKoniecOsobnejPrehliadky, simulacia.GeneratorDetektor.Generate());
+                simulacia.ScheduleEvent(new EZaciatokPrehliadkyDetektor(simulacia, dalsiCestujuci), simulacia.CurrentTime);
             }
             else
             {
