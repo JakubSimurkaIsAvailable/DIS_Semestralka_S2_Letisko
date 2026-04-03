@@ -42,7 +42,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
                 default:
                     throw new Exception("Neplatny rad cestujuceho.");
             }
-            if(radPredDetektorom.Count > 0)
+            radPredDetektorom.Dequeue();
+            if (radPredDetektorom.Count > 0)
             {
                 Cestujuci dalsiCestujuci = radPredDetektorom.Peek();
                 detektor.JeVolny = false;
@@ -58,6 +59,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
             else
                 simulacia.PocetVRadePredZberom2.AddWeightedValue(radPredZberomPrepraviek.Count, simulacia.CurrentTime);
             simulacia.PocetVRadePredZberomSpolu.AddWeightedValue(simulacia.RadPredZberomPrepraviek1.Count + simulacia.RadPredZberomPrepraviek2.Count, simulacia.CurrentTime);
+
             if(zberPrepraviekVolny)
             {
                 simulacia.ScheduleEvent(new EPrichodZberPrepraviek(simulacia, cestujuci), simulacia.CurrentTime);
