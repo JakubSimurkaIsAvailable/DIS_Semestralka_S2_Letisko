@@ -42,7 +42,17 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
                 default:
                     throw new Exception("Neplatny rad cestujuceho.");
             }
-            radPredDetektorom.Dequeue();
+            
+            if (cestujuci.Rad == 0)
+                simulacia.PocetVRadePredDetektorom1.AddWeightedValue(radPredDetektorom.Count, simulacia.CurrentTime);
+            else
+                simulacia.PocetVRadePredDetektorom2.AddWeightedValue(radPredDetektorom.Count, simulacia.CurrentTime);
+            simulacia.PocetVRadePredDetektoromSpolu.AddWeightedValue(simulacia.RadPredDetektorom1.Count + simulacia.RadPredDetektorom2.Count, simulacia.CurrentTime);
+            Cestujuci kontrola = radPredDetektorom.Dequeue();
+            if (kontrola.ID != cestujuci.ID)
+            {
+                throw new Exception("Cestujuci sa nezhoduje.");
+            }
             if (radPredDetektorom.Count > 0)
             {
                 Cestujuci dalsiCestujuci = radPredDetektorom.Peek();
@@ -53,14 +63,14 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
             {
                 detektor.JeVolny = true;
             }
-            radPredZberomPrepraviek.Enqueue(cestujuci);
+            
             if (cestujuci.Rad == 0)
                 simulacia.PocetVRadePredZberom1.AddWeightedValue(radPredZberomPrepraviek.Count, simulacia.CurrentTime);
             else
                 simulacia.PocetVRadePredZberom2.AddWeightedValue(radPredZberomPrepraviek.Count, simulacia.CurrentTime);
             simulacia.PocetVRadePredZberomSpolu.AddWeightedValue(simulacia.RadPredZberomPrepraviek1.Count + simulacia.RadPredZberomPrepraviek2.Count, simulacia.CurrentTime);
-
-            if(zberPrepraviekVolny)
+            radPredZberomPrepraviek.Enqueue(cestujuci);
+            if (zberPrepraviekVolny)
             {
                 simulacia.ScheduleEvent(new EPrichodZberPrepraviek(simulacia, cestujuci), simulacia.CurrentTime);
             }

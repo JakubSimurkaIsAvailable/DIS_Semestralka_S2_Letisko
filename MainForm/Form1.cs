@@ -34,9 +34,10 @@ namespace MainForm
             btnStart.Enabled = false;
             btnPause.Enabled = true;
             btnStop.Enabled = true;
-            _refreshTimer.Start();
+            if (!chkMaxSpeed.Checked)
+                _refreshTimer.Start();
 
-            Task.Run(() => _sim.RunSimulation(1))
+            Task.Run(() => _sim.RunSimulation(10_000))
                 .ContinueWith(_ => BeginInvoke(OnSimulationFinished));
         }
 
@@ -57,7 +58,10 @@ namespace MainForm
         private void OnSimulationFinished()
         {
             _refreshTimer.Stop();
-            UpdateLabels();
+            if (chkMaxSpeed.Checked)
+                UpdateGlobalStats();
+            else
+                UpdateLabels();
             btnStart.Enabled = true;
             btnPause.Enabled = false;
             btnStop.Enabled = false;
@@ -155,6 +159,25 @@ namespace MainForm
             lblAvgRadRontgenSpoluValue.Text   = _sim.PocetVRadePredRontgenomSpolu.WeightedAverage.ToString("F4");
             lblAvgRadDetektorSpoluValue.Text  = _sim.PocetVRadePredDetektoromSpolu.WeightedAverage.ToString("F4");
             lblAvgRadZberSpoluValue.Text      = _sim.PocetVRadePredZberomSpolu.WeightedAverage.ToString("F4");
+
+            UpdateGlobalStats();
+        }
+
+        private void UpdateGlobalStats()
+        {
+            if (_sim == null) return;
+            int rep = _sim.GlobalAvgCasVSysteme.ValueCounter;
+            lblReplikacieValue.Text                 = rep.ToString();
+            lblGlobalCasVSystemeValue.Text          = rep > 0 ? _sim.GlobalAvgCasVSysteme.Average.ToString("F2")           : "—";
+            lblGlobalAvgRadRontgen1Value.Text       = rep > 0 ? _sim.GlobalAvgRadPredRontgenom1.Average.ToString("F4")     : "—";
+            lblGlobalAvgRadRontgen2Value.Text       = rep > 0 ? _sim.GlobalAvgRadPredRontgenom2.Average.ToString("F4")     : "—";
+            lblGlobalAvgRadDetektor1Value.Text      = rep > 0 ? _sim.GlobalAvgRadPredDetektorom1.Average.ToString("F4")    : "—";
+            lblGlobalAvgRadDetektor2Value.Text      = rep > 0 ? _sim.GlobalAvgRadPredDetektorom2.Average.ToString("F4")    : "—";
+            lblGlobalAvgRadZber1Value.Text          = rep > 0 ? _sim.GlobalAvgRadPredZberom1.Average.ToString("F4")        : "—";
+            lblGlobalAvgRadZber2Value.Text          = rep > 0 ? _sim.GlobalAvgRadPredZberom2.Average.ToString("F4")        : "—";
+            lblGlobalAvgRadRontgenSpoluValue.Text   = rep > 0 ? _sim.GlobalAvgRadPredRontgenomSpolu.Average.ToString("F4") : "—";
+            lblGlobalAvgRadDetektorSpoluValue.Text  = rep > 0 ? _sim.GlobalAvgRadPredDetektoromSpolu.Average.ToString("F4"): "—";
+            lblGlobalAvgRadZberSpoluValue.Text      = rep > 0 ? _sim.GlobalAvgRadPredZberomSpolu.Average.ToString("F4")    : "—";
         }
 
         private static void UpdateTerminal(

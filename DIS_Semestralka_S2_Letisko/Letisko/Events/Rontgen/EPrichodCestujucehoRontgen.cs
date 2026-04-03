@@ -19,8 +19,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
         {
             LetiskoSimulation simulacia = (LetiskoSimulation)Core;
             Cestujuci cestujuci = (Cestujuci)Actor;
-            cestujuci.CasNalozeniaPrepraviek = cestujuci.CasPrichoduPriRontgen;
-            simulacia.ScheduleEvent(new ENalozeniePrepravkyNaPas(simulacia, cestujuci), cestujuci.CasPrichoduPriRontgen);
+            simulacia.ScheduleEvent(new ENalozeniePrepravkyNaPas(simulacia, cestujuci), simulacia.CurrentTime);
             return cestujuci.CasPrichoduPriRontgen;
         }
     }

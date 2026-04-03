@@ -53,7 +53,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
                 }
             }
 
-            if (rontgen.JeVolnyPrepravka && rontgen.PocetPrepraviekPred > 0)
+            if (rontgen.JeVolnyPrepravka && rontgen.PocetPrepraviekPred > 0 && rontgen.PocetPrepraviekZa < rontgen.MaxAfter)
             {
                 rontgen.JeVolnyPrepravka = false;
                 Prepravka prvaPrepravka = rontgen.PrepravkyPredRontgenom.Peek();

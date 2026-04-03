@@ -44,12 +44,18 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
                     throw new Exception("Neplatny rad cestujuceho.");
             }
 
-            rad.Dequeue();
+            
             if (cestujuci.Rad == 0)
                 simulacia.PocetVRadePredRontgenom1.AddWeightedValue(rad.Count, simulacia.CurrentTime);
             else
                 simulacia.PocetVRadePredRontgenom2.AddWeightedValue(rad.Count, simulacia.CurrentTime);
             simulacia.PocetVRadePredRontgenomSpolu.AddWeightedValue(simulacia.RadPredRontgenom1.Count + simulacia.RadPredRontgenom2.Count, simulacia.CurrentTime);
+
+            Cestujuci kontrola = rad.Dequeue();
+            if (kontrola.ID != cestujuci.ID)
+            {
+                throw new Exception("Cestujuci sa nezhoduje");
+            }
 
             if (rad.Count > 0)
             {
@@ -67,12 +73,13 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
                 detektor.JeVolny = false;
                 simulacia.ScheduleEvent(new EZaciatokPrehliadkyDetektor(simulacia, cestujuci), simulacia.CurrentTime);
             }
-            radDetektor.Enqueue(cestujuci);
+            
             if (cestujuci.Rad == 0)
                 simulacia.PocetVRadePredDetektorom1.AddWeightedValue(radDetektor.Count, simulacia.CurrentTime);
             else
                 simulacia.PocetVRadePredDetektorom2.AddWeightedValue(radDetektor.Count, simulacia.CurrentTime);
             simulacia.PocetVRadePredDetektoromSpolu.AddWeightedValue(simulacia.RadPredDetektorom1.Count + simulacia.RadPredDetektorom2.Count, simulacia.CurrentTime);
+            radDetektor.Enqueue(cestujuci);
             return simulacia.CurrentTime;
         }
     }

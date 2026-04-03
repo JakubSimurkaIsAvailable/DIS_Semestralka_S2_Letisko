@@ -73,8 +73,9 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
         {
             // ----------------------- Generatory ----------------------
             GeneratorGeneratorov = new Random();
+            double lambda = 1.0 / 15.0; // Priemerny cas medzi prichodmi je 15 sekund
             GeneratorRontgenPrepravky = new RozdelenieSpojite(GeneratorGeneratorov, 9, 46);
-            GeneratorPrichodov = new ExponencialnyGenerator(GeneratorGeneratorov, 15);
+            GeneratorPrichodov = new ExponencialnyGenerator(GeneratorGeneratorov, lambda);
             GeneratorDetektor = new RozdelenieSpojite(GeneratorGeneratorov, 6, 27);
             GeneratorDodatocnejPrehliadky = new TrojuholnikovyGenerator(GeneratorGeneratorov, 10, 35, 120);
             double[] pravdepodobnosti = new double[] { 0.15, 0.68, 0.17 };
@@ -126,6 +127,19 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             EventQueue = new PriorityQueue<Event, double>();
             CurrentTime = 0;
             PocetCestujucich = 0;
+            // Reset queues and objects
+            RadPredRontgenom1 = new Queue<Cestujuci>();
+            RadPredRontgenom2 = new Queue<Cestujuci>();
+            Rontgen1 = new Rontgen(4, 5);
+            Rontgen2 = new Rontgen(4, 5);
+            RadPredDetektorom1 = new Queue<Cestujuci>();
+            RadPredDetektorom2 = new Queue<Cestujuci>();
+            Detektor1 = new DetektorKovu();
+            Detektor2 = new DetektorKovu();
+            RadPredZberomPrepraviek1 = new Queue<Cestujuci>();
+            RadPredZberomPrepraviek2 = new Queue<Cestujuci>();
+            ZberPrepraviek1Volny = true;
+            ZberPrepraviek2Volny = true;
             double firstArrival = GeneratorPrichodov.Generate();
             ScheduleEvent(new EPrichodCestujuceho(this, new Cestujuci(firstArrival, PocetCestujucich)), firstArrival);
             if (Slowdown)
@@ -140,6 +154,16 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             PocetVRadePredDetektoromSpolu = new WeightedStatisticsCollector();
             PocetVRadePredZberomSpolu = new WeightedStatisticsCollector();
             CasVSystemeCollector = new StatisticsCollector();
+
+            PocetVRadePredRontgenom1.AddWeightedValue(0, 0);
+            PocetVRadePredRontgenom2.AddWeightedValue(0, 0);
+            PocetVRadePredDetektorom1.AddWeightedValue(0, 0);
+            PocetVRadePredDetektorom2.AddWeightedValue(0, 0);
+            PocetVRadePredZberom1.AddWeightedValue(0, 0);
+            PocetVRadePredZberom2.AddWeightedValue(0, 0);
+            PocetVRadePredRontgenomSpolu.AddWeightedValue(0, 0);
+            PocetVRadePredDetektoromSpolu.AddWeightedValue(0, 0);
+            PocetVRadePredZberomSpolu.AddWeightedValue(0, 0);
         }
 
         protected override void AfterReplication()

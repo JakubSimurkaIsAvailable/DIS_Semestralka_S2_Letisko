@@ -80,6 +80,31 @@ namespace MainForm
             lblAvgRadZberSpoluTitle     = new Label();
             lblAvgRadZberSpoluValue     = new Label();
 
+            // ── Global statistics ─────────────────────────────────────────────
+            grpGlobalStats                      = new GroupBox();
+            lblReplikacieTitle                  = new Label();
+            lblReplikacieValue                  = new Label();
+            lblGlobalCasVSystemeTitle           = new Label();
+            lblGlobalCasVSystemeValue           = new Label();
+            lblGlobalAvgRadRontgen1Title        = new Label();
+            lblGlobalAvgRadRontgen1Value        = new Label();
+            lblGlobalAvgRadRontgen2Title        = new Label();
+            lblGlobalAvgRadRontgen2Value        = new Label();
+            lblGlobalAvgRadDetektor1Title       = new Label();
+            lblGlobalAvgRadDetektor1Value       = new Label();
+            lblGlobalAvgRadDetektor2Title       = new Label();
+            lblGlobalAvgRadDetektor2Value       = new Label();
+            lblGlobalAvgRadZber1Title           = new Label();
+            lblGlobalAvgRadZber1Value           = new Label();
+            lblGlobalAvgRadZber2Title           = new Label();
+            lblGlobalAvgRadZber2Value           = new Label();
+            lblGlobalAvgRadRontgenSpoluTitle    = new Label();
+            lblGlobalAvgRadRontgenSpoluValue    = new Label();
+            lblGlobalAvgRadDetektorSpoluTitle   = new Label();
+            lblGlobalAvgRadDetektorSpoluValue   = new Label();
+            lblGlobalAvgRadZberSpoluTitle       = new Label();
+            lblGlobalAvgRadZberSpoluValue       = new Label();
+
             // ── Terminal 2 ────────────────────────────────────────────────────
             grpTerminal2                = new GroupBox();
             lblRontgenCestujuci2Title   = new Label();
@@ -104,6 +129,7 @@ namespace MainForm
             grpSpeed.SuspendLayout();
             grpTerminal1.SuspendLayout();
             grpTerminal2.SuspendLayout();
+            grpGlobalStats.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)sldSleep).BeginInit();
             ((System.ComponentModel.ISupportInitialize)sldStep).BeginInit();
             SuspendLayout();
@@ -591,9 +617,151 @@ namespace MainForm
             grpStats.Controls.Add(lblAvgRadZberSpoluValue);
             grpStats.ResumeLayout(false);
 
+            // ── Global Statistics GroupBox ────────────────────────────────────
+            grpGlobalStats.Location = new Point(10, 985);
+            grpGlobalStats.Size     = new Size(1052, 230);
+            grpGlobalStats.Text     = "Celkové štatistiky naprieč replikáciami";
+            grpGlobalStats.Font     = new Font("Segoe UI", 10f, FontStyle.Bold);
+
+            lblReplikacieTitle.Location = new Point(10, 25);
+            lblReplikacieTitle.Size     = new Size(150, 20);
+            lblReplikacieTitle.Text     = "Počet replikácií:";
+            lblReplikacieTitle.Font     = fTitle;
+
+            lblReplikacieValue.Location = new Point(165, 25);
+            lblReplikacieValue.Size     = new Size(100, 20);
+            lblReplikacieValue.Text     = "0";
+            lblReplikacieValue.Font     = fStatus;
+
+            lblGlobalCasVSystemeTitle.Location = new Point(400, 25);
+            lblGlobalCasVSystemeTitle.Size     = new Size(230, 20);
+            lblGlobalCasVSystemeTitle.Text     = "Priem. čas v systéme (s):";
+            lblGlobalCasVSystemeTitle.Font     = fTitle;
+
+            lblGlobalCasVSystemeValue.Location = new Point(635, 25);
+            lblGlobalCasVSystemeValue.Size     = new Size(130, 20);
+            lblGlobalCasVSystemeValue.Text     = "—";
+            lblGlobalCasVSystemeValue.Font     = fStatus;
+
+            lblGlobalAvgRadRontgen1Title.Location = new Point(10, 55);
+            lblGlobalAvgRadRontgen1Title.Size     = new Size(210, 20);
+            lblGlobalAvgRadRontgen1Title.Text     = "Priem. rad röntgen 1:";
+            lblGlobalAvgRadRontgen1Title.Font     = fTitle;
+
+            lblGlobalAvgRadRontgen1Value.Location = new Point(225, 55);
+            lblGlobalAvgRadRontgen1Value.Size     = new Size(110, 20);
+            lblGlobalAvgRadRontgen1Value.Text     = "—";
+            lblGlobalAvgRadRontgen1Value.Font     = fStatus;
+
+            lblGlobalAvgRadRontgen2Title.Location = new Point(536, 55);
+            lblGlobalAvgRadRontgen2Title.Size     = new Size(210, 20);
+            lblGlobalAvgRadRontgen2Title.Text     = "Priem. rad röntgen 2:";
+            lblGlobalAvgRadRontgen2Title.Font     = fTitle;
+
+            lblGlobalAvgRadRontgen2Value.Location = new Point(751, 55);
+            lblGlobalAvgRadRontgen2Value.Size     = new Size(110, 20);
+            lblGlobalAvgRadRontgen2Value.Text     = "—";
+            lblGlobalAvgRadRontgen2Value.Font     = fStatus;
+
+            lblGlobalAvgRadDetektor1Title.Location = new Point(10, 80);
+            lblGlobalAvgRadDetektor1Title.Size     = new Size(210, 20);
+            lblGlobalAvgRadDetektor1Title.Text     = "Priem. rad detektor 1:";
+            lblGlobalAvgRadDetektor1Title.Font     = fTitle;
+
+            lblGlobalAvgRadDetektor1Value.Location = new Point(225, 80);
+            lblGlobalAvgRadDetektor1Value.Size     = new Size(110, 20);
+            lblGlobalAvgRadDetektor1Value.Text     = "—";
+            lblGlobalAvgRadDetektor1Value.Font     = fStatus;
+
+            lblGlobalAvgRadDetektor2Title.Location = new Point(536, 80);
+            lblGlobalAvgRadDetektor2Title.Size     = new Size(210, 20);
+            lblGlobalAvgRadDetektor2Title.Text     = "Priem. rad detektor 2:";
+            lblGlobalAvgRadDetektor2Title.Font     = fTitle;
+
+            lblGlobalAvgRadDetektor2Value.Location = new Point(751, 80);
+            lblGlobalAvgRadDetektor2Value.Size     = new Size(110, 20);
+            lblGlobalAvgRadDetektor2Value.Text     = "—";
+            lblGlobalAvgRadDetektor2Value.Font     = fStatus;
+
+            lblGlobalAvgRadZber1Title.Location = new Point(10, 105);
+            lblGlobalAvgRadZber1Title.Size     = new Size(210, 20);
+            lblGlobalAvgRadZber1Title.Text     = "Priem. rad zber 1:";
+            lblGlobalAvgRadZber1Title.Font     = fTitle;
+
+            lblGlobalAvgRadZber1Value.Location = new Point(225, 105);
+            lblGlobalAvgRadZber1Value.Size     = new Size(110, 20);
+            lblGlobalAvgRadZber1Value.Text     = "—";
+            lblGlobalAvgRadZber1Value.Font     = fStatus;
+
+            lblGlobalAvgRadZber2Title.Location = new Point(536, 105);
+            lblGlobalAvgRadZber2Title.Size     = new Size(210, 20);
+            lblGlobalAvgRadZber2Title.Text     = "Priem. rad zber 2:";
+            lblGlobalAvgRadZber2Title.Font     = fTitle;
+
+            lblGlobalAvgRadZber2Value.Location = new Point(751, 105);
+            lblGlobalAvgRadZber2Value.Size     = new Size(110, 20);
+            lblGlobalAvgRadZber2Value.Text     = "—";
+            lblGlobalAvgRadZber2Value.Font     = fStatus;
+
+            lblGlobalAvgRadRontgenSpoluTitle.Location = new Point(10, 135);
+            lblGlobalAvgRadRontgenSpoluTitle.Size     = new Size(210, 20);
+            lblGlobalAvgRadRontgenSpoluTitle.Text     = "Priem. rad röntgen (spolu):";
+            lblGlobalAvgRadRontgenSpoluTitle.Font     = fTitle;
+
+            lblGlobalAvgRadRontgenSpoluValue.Location = new Point(225, 135);
+            lblGlobalAvgRadRontgenSpoluValue.Size     = new Size(110, 20);
+            lblGlobalAvgRadRontgenSpoluValue.Text     = "—";
+            lblGlobalAvgRadRontgenSpoluValue.Font     = fStatus;
+
+            lblGlobalAvgRadDetektorSpoluTitle.Location = new Point(10, 160);
+            lblGlobalAvgRadDetektorSpoluTitle.Size     = new Size(210, 20);
+            lblGlobalAvgRadDetektorSpoluTitle.Text     = "Priem. rad detektor (spolu):";
+            lblGlobalAvgRadDetektorSpoluTitle.Font     = fTitle;
+
+            lblGlobalAvgRadDetektorSpoluValue.Location = new Point(225, 160);
+            lblGlobalAvgRadDetektorSpoluValue.Size     = new Size(110, 20);
+            lblGlobalAvgRadDetektorSpoluValue.Text     = "—";
+            lblGlobalAvgRadDetektorSpoluValue.Font     = fStatus;
+
+            lblGlobalAvgRadZberSpoluTitle.Location = new Point(10, 185);
+            lblGlobalAvgRadZberSpoluTitle.Size     = new Size(210, 20);
+            lblGlobalAvgRadZberSpoluTitle.Text     = "Priem. rad zber (spolu):";
+            lblGlobalAvgRadZberSpoluTitle.Font     = fTitle;
+
+            lblGlobalAvgRadZberSpoluValue.Location = new Point(225, 185);
+            lblGlobalAvgRadZberSpoluValue.Size     = new Size(110, 20);
+            lblGlobalAvgRadZberSpoluValue.Text     = "—";
+            lblGlobalAvgRadZberSpoluValue.Font     = fStatus;
+
+            grpGlobalStats.Controls.Add(lblReplikacieTitle);
+            grpGlobalStats.Controls.Add(lblReplikacieValue);
+            grpGlobalStats.Controls.Add(lblGlobalCasVSystemeTitle);
+            grpGlobalStats.Controls.Add(lblGlobalCasVSystemeValue);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadRontgen1Title);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadRontgen1Value);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadRontgen2Title);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadRontgen2Value);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadDetektor1Title);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadDetektor1Value);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadDetektor2Title);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadDetektor2Value);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadZber1Title);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadZber1Value);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadZber2Title);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadZber2Value);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadRontgenSpoluTitle);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadRontgenSpoluValue);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadDetektorSpoluTitle);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadDetektorSpoluValue);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadZberSpoluTitle);
+            grpGlobalStats.Controls.Add(lblGlobalAvgRadZberSpoluValue);
+            grpGlobalStats.ResumeLayout(false);
+
             // ── Form ──────────────────────────────────────────────────────────
-            ClientSize = new Size(1072, 990);
-            Text       = "Letisko Simulácia";
+            ClientSize   = new Size(1072, 900);
+            AutoScroll   = true;
+            AutoScrollMinSize = new Size(1072, 1230);
+            Text         = "Letisko Simulácia";
             Controls.Add(btnStart);
             Controls.Add(btnPause);
             Controls.Add(btnStop);
@@ -605,10 +773,12 @@ namespace MainForm
             Controls.Add(grpTerminal1);
             Controls.Add(grpTerminal2);
             Controls.Add(grpStats);
+            Controls.Add(grpGlobalStats);
 
             grpSpeed.ResumeLayout(false);
             grpTerminal1.ResumeLayout(false);
             grpTerminal2.ResumeLayout(false);
+            // grpGlobalStats already resumed above
             ((System.ComponentModel.ISupportInitialize)sldSleep).EndInit();
             ((System.ComponentModel.ISupportInitialize)sldStep).EndInit();
             ResumeLayout(false);
@@ -676,7 +846,7 @@ namespace MainForm
         private Label     lblRadZber2Title;
         private ListBox   lstRadZber2;
 
-        // Statistics
+        // Statistics (per-replication)
         private GroupBox  grpStats;
         private Label     lblCasVSystemeTitle;
         private Label     lblCasVSystemeValue;
@@ -698,5 +868,30 @@ namespace MainForm
         private Label     lblAvgRadDetektorSpoluValue;
         private Label     lblAvgRadZberSpoluTitle;
         private Label     lblAvgRadZberSpoluValue;
+
+        // Global statistics (across replications)
+        private GroupBox  grpGlobalStats;
+        private Label     lblReplikacieTitle;
+        private Label     lblReplikacieValue;
+        private Label     lblGlobalCasVSystemeTitle;
+        private Label     lblGlobalCasVSystemeValue;
+        private Label     lblGlobalAvgRadRontgen1Title;
+        private Label     lblGlobalAvgRadRontgen1Value;
+        private Label     lblGlobalAvgRadRontgen2Title;
+        private Label     lblGlobalAvgRadRontgen2Value;
+        private Label     lblGlobalAvgRadDetektor1Title;
+        private Label     lblGlobalAvgRadDetektor1Value;
+        private Label     lblGlobalAvgRadDetektor2Title;
+        private Label     lblGlobalAvgRadDetektor2Value;
+        private Label     lblGlobalAvgRadZber1Title;
+        private Label     lblGlobalAvgRadZber1Value;
+        private Label     lblGlobalAvgRadZber2Title;
+        private Label     lblGlobalAvgRadZber2Value;
+        private Label     lblGlobalAvgRadRontgenSpoluTitle;
+        private Label     lblGlobalAvgRadRontgenSpoluValue;
+        private Label     lblGlobalAvgRadDetektorSpoluTitle;
+        private Label     lblGlobalAvgRadDetektorSpoluValue;
+        private Label     lblGlobalAvgRadZberSpoluTitle;
+        private Label     lblGlobalAvgRadZberSpoluValue;
     }
 }

@@ -24,8 +24,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Arrival
             int pocetPrepraviek = (int)simulacia.GeneratorPercentTable.Generate();
             cestujuci.MaxPocetPrepraviek = pocetPrepraviek;
             cestujuci.AktualnyPocetPrepraviek = pocetPrepraviek;
-            double nasledujuciPrichod = simulacia.GeneratorPrichodov.Generate();
-            nasledujuciPrichod += simulacia.CurrentTime;
+            double nasledujuciPrichod = simulacia.GeneratorPrichodov.Generate() + simulacia.CurrentTime;
             simulacia.ScheduleEvent(new EPrichodCestujuceho(simulacia, new Cestujuci(nasledujuciPrichod, simulacia.PocetCestujucich)), nasledujuciPrichod);
             int[] dlzkyRadov = new int[]
             {
@@ -37,6 +36,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Arrival
             {
                 case 0:
                     simulacia.RadPredRontgenom1.Enqueue(cestujuci);
+
                     simulacia.PocetVRadePredRontgenom1.AddWeightedValue(simulacia.RadPredRontgenom1.Count, simulacia.CurrentTime);
                     simulacia.PocetVRadePredRontgenomSpolu.AddWeightedValue(simulacia.RadPredRontgenom1.Count + simulacia.RadPredRontgenom2.Count, simulacia.CurrentTime);
                     if (simulacia.Rontgen1.JeVolnyCestujuci)
@@ -48,6 +48,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Arrival
                     break;
                 case 1:
                     simulacia.RadPredRontgenom2.Enqueue(cestujuci);
+
                     simulacia.PocetVRadePredRontgenom2.AddWeightedValue(simulacia.RadPredRontgenom2.Count, simulacia.CurrentTime);
                     simulacia.PocetVRadePredRontgenomSpolu.AddWeightedValue(simulacia.RadPredRontgenom1.Count + simulacia.RadPredRontgenom2.Count, simulacia.CurrentTime);
                     if (simulacia.Rontgen2.JeVolnyCestujuci)
@@ -60,7 +61,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Arrival
                 default:
                     throw new Exception("Neplatný rad");
             }
-            return cestujuci.CasPrichodu;
+            return simulacia.CurrentTime;
         }
     }
 }
