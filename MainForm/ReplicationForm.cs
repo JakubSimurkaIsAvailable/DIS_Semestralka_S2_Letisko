@@ -11,17 +11,17 @@ namespace MainForm
     public partial class ReplicationForm : Form
     {
         // ── Labels ───────────────────────────────────────────────────────────
-        private readonly Label _lblRepValue             = new();
-        private readonly Label _lblCasVSystemeValue     = new();
-        private readonly Label _lblRadRontgen1Value     = new();
-        private readonly Label _lblRadRontgen2Value     = new();
-        private readonly Label _lblRadRontgenSpoluValue = new();
-        private readonly Label _lblRadDetektor1Value    = new();
-        private readonly Label _lblRadDetektor2Value    = new();
-        private readonly Label _lblRadDetektorSpoluValue= new();
-        private readonly Label _lblRadZber1Value        = new();
-        private readonly Label _lblRadZber2Value        = new();
-        private readonly Label _lblRadZberSpoluValue    = new();
+        private readonly Label _lblRepValue              = new();
+        private readonly Label _lblCasVSystemeValue      = new();
+        private readonly Label _lblRadRontgenSpoluValue  = new();
+        private readonly Label _lblRadDetektorSpoluValue = new();
+        private readonly Label _lblRadZberSpoluValue     = new();
+
+        // ── CI labels (global across replications) ───────────────────────────
+        private readonly Label _lblCasVSystemeCi      = new();
+        private readonly Label _lblRadRontgenSpoluCi  = new();
+        private readonly Label _lblRadDetektorSpoluCi = new();
+        private readonly Label _lblRadZberSpoluCi     = new();
 
         // ── Charts ───────────────────────────────────────────────────────────
         private readonly FormsPlot _chartRontgen  = new();
@@ -48,9 +48,9 @@ namespace MainForm
 
         private void BuildLayout()
         {
-            Text           = "Štatistiky replikácie";
-            Size           = new Size(1100, 720);
-            MinimumSize    = new Size(800, 500);
+            Text        = "Štatistiky replikácie";
+            Size        = new Size(1100, 720);
+            MinimumSize = new Size(800, 500);
 
             var split = new SplitContainer { Dock = DockStyle.Fill };
             Load += (s, e) =>
@@ -60,17 +60,15 @@ namespace MainForm
                 split.SplitterDistance = 330;
             };
 
-            // Left – labels
             var scrollPanel = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
             scrollPanel.Controls.Add(BuildLabelsTable());
             split.Panel1.Controls.Add(scrollPanel);
 
-            // Right – charts
             var tabs = new TabControl { Dock = DockStyle.Fill };
-            AddChartTab(tabs, "Röntgen",          _chartRontgen);
-            AddChartTab(tabs, "Detektor",          _chartDetektor);
-            AddChartTab(tabs, "Zber prepraviek",   _chartZber);
-            AddChartTab(tabs, "Čas v systéme",     _chartCas);
+            AddChartTab(tabs, "Röntgen",        _chartRontgen);
+            AddChartTab(tabs, "Detektor",        _chartDetektor);
+            AddChartTab(tabs, "Zber prepraviek", _chartZber);
+            AddChartTab(tabs, "Čas v systéme",   _chartCas);
             split.Panel2.Controls.Add(tabs);
 
             Controls.Add(split);
@@ -78,40 +76,54 @@ namespace MainForm
 
         private TableLayoutPanel BuildLabelsTable()
         {
-            var fTitle  = new Font("Segoe UI", 9f);
-            var fValue  = new Font("Segoe UI", 9f, FontStyle.Bold);
-            var table   = new TableLayoutPanel
+            var fTitle = new Font("Segoe UI", 9f);
+            var fValue = new Font("Segoe UI", 9f, FontStyle.Bold);
+            var fCi    = new Font("Segoe UI", 8.5f, FontStyle.Italic);
+            var table  = new TableLayoutPanel
             {
                 Dock        = DockStyle.Top,
-                ColumnCount = 2,
+                ColumnCount = 3,
                 AutoSize    = true,
                 Padding     = new Padding(10)
             };
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 65));
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35));
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42));
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22));
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 36));
 
-            void Row(string title, Label val)
+            void Row(string title, Label val, Label? ci = null)
             {
                 val.Text   = "—";
                 val.Font   = fValue;
                 val.Anchor = AnchorStyles.Left;
                 table.Controls.Add(new Label { Text = title, Font = fTitle, AutoSize = true, Anchor = AnchorStyles.Left });
                 table.Controls.Add(val);
+                if (ci != null)
+                {
+                    ci.Text      = "—";
+                    ci.Font      = fCi;
+                    ci.ForeColor = SystemColors.GrayText;
+                    ci.Anchor    = AnchorStyles.Left;
+                    table.Controls.Add(ci);
+                }
+                else
+                {
+                    table.Controls.Add(new Label());
+                }
             }
 
-            Row("Replikácia:",              _lblRepValue);
-            Row("Čas v systéme (s):",       _lblCasVSystemeValue);
-            Row("Rad röntgen 1:",           _lblRadRontgen1Value);
-            Row("Rad röntgen 2:",           _lblRadRontgen2Value);
-            Row("Rad röntgen (spolu):",     _lblRadRontgenSpoluValue);
-            Row("Rad detektor 1:",          _lblRadDetektor1Value);
-            Row("Rad detektor 2:",          _lblRadDetektor2Value);
-            Row("Rad detektor (spolu):",    _lblRadDetektorSpoluValue);
-            Row("Rad zber 1:",              _lblRadZber1Value);
-            Row("Rad zber 2:",              _lblRadZber2Value);
-            Row("Rad zber (spolu):",        _lblRadZberSpoluValue);
+            Row("Replikácia:",          _lblRepValue);
+            Row("Čas v systéme (s):",   _lblCasVSystemeValue,     _lblCasVSystemeCi);
+            Row("Rad röntgen (spolu):",  _lblRadRontgenSpoluValue, _lblRadRontgenSpoluCi);
+            Row("Rad detektor (spolu):", _lblRadDetektorSpoluValue,_lblRadDetektorSpoluCi);
+            Row("Rad zber (spolu):",     _lblRadZberSpoluValue,    _lblRadZberSpoluCi);
 
             return table;
+        }
+
+        private static string FormatCi(DIS_Semestralka_S2_Letisko.Simulation.Collectors.StatisticsCollector col)
+        {
+            var ci = col.GetConfidenceInterval();
+            return ci.HasValue ? $"[{ci.Value.Lower:F4}; {ci.Value.Upper:F4}]" : "< 30 rep.";
         }
 
         private static void AddChartTab(TabControl tabs, string title, FormsPlot fp)
@@ -149,31 +161,29 @@ namespace MainForm
             dl.Color = color;
         }
 
-        // ── Public update (called from Form1 only when NOT max speed) ─────────
+        // ── Public update (called from MainForm only when NOT max speed) ──────
 
         public void Update(LetiskoSimulation sim)
         {
-            // Detect new replication → reset charts
             if (sim.CurrentReplication != _lastReplication)
             {
                 _lastReplication = sim.CurrentReplication;
                 InitCharts();
             }
 
-            // Labels
-            _lblRepValue.Text              = sim.CurrentReplication.ToString();
-            _lblCasVSystemeValue.Text      = sim.CasVSystemeCollector.Average.ToString("F2");
-            _lblRadRontgen1Value.Text      = sim.PocetVRadePredRontgenom1.WeightedAverage.ToString("F4");
-            _lblRadRontgen2Value.Text      = sim.PocetVRadePredRontgenom2.WeightedAverage.ToString("F4");
-            _lblRadRontgenSpoluValue.Text  = sim.PocetVRadePredRontgenomSpolu.WeightedAverage.ToString("F4");
-            _lblRadDetektor1Value.Text     = sim.PocetVRadePredDetektorom1.WeightedAverage.ToString("F4");
-            _lblRadDetektor2Value.Text     = sim.PocetVRadePredDetektorom2.WeightedAverage.ToString("F4");
-            _lblRadDetektorSpoluValue.Text = sim.PocetVRadePredDetektoromSpolu.WeightedAverage.ToString("F4");
-            _lblRadZber1Value.Text         = sim.PocetVRadePredZberom1.WeightedAverage.ToString("F4");
-            _lblRadZber2Value.Text         = sim.PocetVRadePredZberom2.WeightedAverage.ToString("F4");
-            _lblRadZberSpoluValue.Text     = sim.PocetVRadePredZberomSpolu.WeightedAverage.ToString("F4");
+            int rep = sim.GlobalAvgCasVSysteme.ValueCounter;
 
-            // Push combined queue counts directly into ScottPlot
+            _lblRepValue.Text             = sim.CurrentReplication.ToString();
+            _lblCasVSystemeValue.Text     = sim.CasVSystemeCollector.Average.ToString("F2");
+            _lblRadRontgenSpoluValue.Text = sim.PocetVRadePredRontgenomSpolu.WeightedAverage.ToString("F4");
+            _lblRadDetektorSpoluValue.Text= sim.PocetVRadePredDetektoromSpolu.WeightedAverage.ToString("F4");
+            _lblRadZberSpoluValue.Text    = sim.PocetVRadePredZberomSpolu.WeightedAverage.ToString("F4");
+
+            _lblCasVSystemeCi.Text      = rep > 0 ? FormatCi(sim.GlobalAvgCasVSysteme)           : "—";
+            _lblRadRontgenSpoluCi.Text  = rep > 0 ? FormatCi(sim.GlobalAvgRadPredRontgenomSpolu)  : "—";
+            _lblRadDetektorSpoluCi.Text = rep > 0 ? FormatCi(sim.GlobalAvgRadPredDetektoromSpolu) : "—";
+            _lblRadZberSpoluCi.Text     = rep > 0 ? FormatCi(sim.GlobalAvgRadPredZberomSpolu)     : "—";
+
             _dlRontgen!.Add(sim.RadPredRontgenom1.Count + sim.RadPredRontgenom2.Count);
             _dlDetektor!.Add(sim.RadPredDetektorom1.Count + sim.RadPredDetektorom2.Count);
             _dlZber!.Add(sim.RadPredZberomPrepraviek1.Count + sim.RadPredZberomPrepraviek2.Count);

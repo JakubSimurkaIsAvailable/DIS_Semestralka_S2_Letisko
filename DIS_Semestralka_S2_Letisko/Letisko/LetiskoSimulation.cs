@@ -72,11 +72,10 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
         public StatisticsCollector GlobalAvgCasVSysteme { get; private set; }
         // --------------------------------------------------------------
 
-        public LetiskoSimulation()
+        public LetiskoSimulation(double lambda)
         {
             // ----------------------- Generatory ----------------------
             GeneratorGeneratorov = new Random();
-            double lambda = 1.0 / 15.0; // Priemerny cas medzi prichodmi je 15 sekund
             GeneratorRontgenPrepravky = new RozdelenieSpojite(GeneratorGeneratorov, 9, 46);
             GeneratorPrichodov = new ExponencialnyGenerator(GeneratorGeneratorov, lambda);
             GeneratorDetektor = new RozdelenieSpojite(GeneratorGeneratorov, 6, 27);

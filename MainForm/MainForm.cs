@@ -37,6 +37,12 @@ namespace MainForm
             _simulationForm.BringToFront();
         }
 
+        private void numCestujucich_ValueChanged(object sender, EventArgs e)
+        {
+            double lambda = (double)numCestujucich.Value / 86400.0;
+            lblLambdaValue.Text = $"{lambda:F6} /s";
+        }
+
         private void btnStart_Click(object sender, EventArgs e)
         {
             if (_sim != null)
@@ -45,7 +51,10 @@ namespace MainForm
                 _sim.Run = false;
             }
 
-            _sim = new LetiskoSimulation();
+            double lambda = (double)numCestujucich.Value / 86400.0;
+            int replikacii = chkMaxSpeed.Checked ? (int)numReplikacii.Value : 1;
+
+            _sim = new LetiskoSimulation(lambda);
             _sim.RegisterDelegate(this);
             ApplySpeedSettings();
             _simulationForm?.Reset();
@@ -56,7 +65,7 @@ namespace MainForm
             if (!chkMaxSpeed.Checked)
                 _refreshTimer.Start();
 
-            Task.Run(() => _sim.RunSimulation(10_00))
+            Task.Run(() => _sim.RunSimulation(replikacii))
                 .ContinueWith(_ => BeginInvoke(OnSimulationFinished));
         }
 

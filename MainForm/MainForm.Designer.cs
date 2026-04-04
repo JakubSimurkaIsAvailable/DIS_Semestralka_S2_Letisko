@@ -107,6 +107,15 @@ namespace MainForm
             lblGlobalAvgRadZberSpoluTitle       = new Label();
             lblGlobalAvgRadZberSpoluValue       = new Label();
 
+            // ── Parameters group ─────────────────────────────────────────────
+            grpParams            = new GroupBox();
+            lblReplikaciiTitle   = new Label();
+            numReplikacii        = new NumericUpDown();
+            lblCestujucichTitle  = new Label();
+            numCestujucich       = new NumericUpDown();
+            lblLambdaTitle       = new Label();
+            lblLambdaValue       = new Label();
+
             // ── Terminal 2 ────────────────────────────────────────────────────
             grpTerminal2                = new GroupBox();
             lblRontgenCestujuci2Title   = new Label();
@@ -128,6 +137,9 @@ namespace MainForm
             lblRadZber2Title            = new Label();
             lstRadZber2                 = new ListBox();
 
+            grpParams.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numReplikacii).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numCestujucich).BeginInit();
             grpSpeed.SuspendLayout();
             grpTerminal1.SuspendLayout();
             grpTerminal2.SuspendLayout();
@@ -167,7 +179,7 @@ namespace MainForm
             btnSimulationStats.Click   += btnSimulationStats_Click;
 
             // ── grpSpeed ──────────────────────────────────────────────────────
-            grpSpeed.Location = new Point(15, 60);
+            grpSpeed.Location = new Point(15, 160);
             grpSpeed.Size     = new Size(600, 140);
             grpSpeed.Text     = "Rýchlosť simulácie";
             grpSpeed.Controls.Add(chkMaxSpeed);
@@ -229,22 +241,22 @@ namespace MainForm
             var boldNormal = new Font("Segoe UI", 9.5f, FontStyle.Bold);
             var plainNormal = new Font("Segoe UI", 9.5f);
 
-            lblSimTimeTitle.Location = new Point(15, 213);
+            lblSimTimeTitle.Location = new Point(15, 313);
             lblSimTimeTitle.Size     = new Size(105, 22);
             lblSimTimeTitle.Text     = "Čas simulácie:";
             lblSimTimeTitle.Font     = boldNormal;
 
-            lblSimTimeValue.Location = new Point(125, 213);
+            lblSimTimeValue.Location = new Point(125, 313);
             lblSimTimeValue.Size     = new Size(120, 22);
             lblSimTimeValue.Text     = "00:00:00";
             lblSimTimeValue.Font     = plainNormal;
 
-            lblPocetTitle.Location = new Point(285, 213);
+            lblPocetTitle.Location = new Point(285, 313);
             lblPocetTitle.Size     = new Size(165, 22);
             lblPocetTitle.Text     = "Počet cestujúcich:";
             lblPocetTitle.Font     = boldNormal;
 
-            lblPocetValue.Location = new Point(455, 213);
+            lblPocetValue.Location = new Point(455, 313);
             lblPocetValue.Size     = new Size(80, 22);
             lblPocetValue.Text     = "0";
             lblPocetValue.Font     = plainNormal;
@@ -255,9 +267,56 @@ namespace MainForm
             var fMono   = new Font("Consolas", 8.5f);
 
             // ══════════════════════════════════════════════════════════════════
+            // ── Parameters GroupBox ───────────────────────────────────────────
+            // ══════════════════════════════════════════════════════════════════
+            grpParams.Location = new Point(15, 60);
+            grpParams.Size     = new Size(600, 90);
+            grpParams.Text     = "Parametre simulácie";
+
+            lblReplikaciiTitle.Location = new Point(12, 25);
+            lblReplikaciiTitle.Size     = new Size(160, 20);
+            lblReplikaciiTitle.Text     = "Počet replikácií:";
+            lblReplikaciiTitle.Font     = fTitle;
+
+            numReplikacii.Location = new Point(178, 22);
+            numReplikacii.Size     = new Size(120, 26);
+            numReplikacii.Minimum  = 1;
+            numReplikacii.Maximum  = 1000000;
+            numReplikacii.Value    = 1000;
+
+            lblCestujucichTitle.Location = new Point(12, 57);
+            lblCestujucichTitle.Size     = new Size(160, 20);
+            lblCestujucichTitle.Text     = "Cestujúci za 24h:";
+            lblCestujucichTitle.Font     = fTitle;
+
+            numCestujucich.Location      = new Point(178, 54);
+            numCestujucich.Size          = new Size(120, 26);
+            numCestujucich.Minimum       = 1;
+            numCestujucich.Maximum       = 1000000;
+            numCestujucich.Value         = 5760;
+            numCestujucich.ValueChanged += numCestujucich_ValueChanged;
+
+            lblLambdaTitle.Location = new Point(315, 57);
+            lblLambdaTitle.Size     = new Size(45, 20);
+            lblLambdaTitle.Text     = "λ =";
+            lblLambdaTitle.Font     = fTitle;
+
+            lblLambdaValue.Location = new Point(360, 57);
+            lblLambdaValue.Size     = new Size(200, 20);
+            lblLambdaValue.Text     = "0.066667 /s";
+            lblLambdaValue.Font     = fStatus;
+
+            grpParams.Controls.Add(lblReplikaciiTitle);
+            grpParams.Controls.Add(numReplikacii);
+            grpParams.Controls.Add(lblCestujucichTitle);
+            grpParams.Controls.Add(numCestujucich);
+            grpParams.Controls.Add(lblLambdaTitle);
+            grpParams.Controls.Add(lblLambdaValue);
+
+            // ══════════════════════════════════════════════════════════════════
             // ── Terminal 1 GroupBox ───────────────────────────────────────────
             // ══════════════════════════════════════════════════════════════════
-            grpTerminal1.Location = new Point(10, 243);
+            grpTerminal1.Location = new Point(10, 343);
             grpTerminal1.Size     = new Size(520, 518);
             grpTerminal1.Text     = "Terminál 1";
             grpTerminal1.Font     = new Font("Segoe UI", 10f, FontStyle.Bold);
@@ -380,7 +439,7 @@ namespace MainForm
             // ══════════════════════════════════════════════════════════════════
             // ── Terminal 2 GroupBox ───────────────────────────────────────────
             // ══════════════════════════════════════════════════════════════════
-            grpTerminal2.Location = new Point(540, 243);
+            grpTerminal2.Location = new Point(540, 343);
             grpTerminal2.Size     = new Size(520, 518);
             grpTerminal2.Text     = "Terminál 2";
             grpTerminal2.Font     = new Font("Segoe UI", 10f, FontStyle.Bold);
@@ -501,7 +560,7 @@ namespace MainForm
             grpTerminal2.Controls.Add(lstRadZber2);
 
             // ── Statistics GroupBox ───────────────────────────────────────────
-            grpStats.Location = new Point(10, 775);
+            grpStats.Location = new Point(10, 875);
             grpStats.Size     = new Size(1052, 200);
             grpStats.Text     = "Štatistiky (priemery za replikáciu)";
             grpStats.Font     = new Font("Segoe UI", 10f, FontStyle.Bold);
@@ -630,7 +689,7 @@ namespace MainForm
             grpStats.ResumeLayout(false);
 
             // ── Global Statistics GroupBox ────────────────────────────────────
-            grpGlobalStats.Location = new Point(10, 985);
+            grpGlobalStats.Location = new Point(10, 1085);
             grpGlobalStats.Size     = new Size(1052, 230);
             grpGlobalStats.Text     = "Celkové štatistiky naprieč replikáciami";
             grpGlobalStats.Font     = new Font("Segoe UI", 10f, FontStyle.Bold);
@@ -772,13 +831,14 @@ namespace MainForm
             // ── Form ──────────────────────────────────────────────────────────
             ClientSize   = new Size(1072, 900);
             AutoScroll   = true;
-            AutoScrollMinSize = new Size(1072, 1230);
+            AutoScrollMinSize = new Size(1072, 1330);
             Text         = "Letisko Simulácia";
             Controls.Add(btnStart);
             Controls.Add(btnPause);
             Controls.Add(btnStop);
             Controls.Add(btnReplicationStats);
             Controls.Add(btnSimulationStats);
+            Controls.Add(grpParams);
             Controls.Add(grpSpeed);
             Controls.Add(lblSimTimeTitle);
             Controls.Add(lblSimTimeValue);
@@ -789,6 +849,9 @@ namespace MainForm
             Controls.Add(grpStats);
             Controls.Add(grpGlobalStats);
 
+            grpParams.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)numReplikacii).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numCestujucich).EndInit();
             grpSpeed.ResumeLayout(false);
             grpTerminal1.ResumeLayout(false);
             grpTerminal2.ResumeLayout(false);
@@ -861,6 +924,15 @@ namespace MainForm
         private Label     lblZber2Value;
         private Label     lblRadZber2Title;
         private ListBox   lstRadZber2;
+
+        // Parameters
+        private GroupBox       grpParams;
+        private Label          lblReplikaciiTitle;
+        private NumericUpDown  numReplikacii;
+        private Label          lblCestujucichTitle;
+        private NumericUpDown  numCestujucich;
+        private Label          lblLambdaTitle;
+        private Label          lblLambdaValue;
 
         // Statistics (per-replication)
         private GroupBox  grpStats;
