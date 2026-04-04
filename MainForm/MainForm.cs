@@ -77,10 +77,7 @@ namespace MainForm
         private void OnSimulationFinished()
         {
             _refreshTimer.Stop();
-            if (chkMaxSpeed.Checked)
-                UpdateGlobalStats();
-            else
-                UpdateLabels();
+            UpdateLabels();
             btnStart.Enabled = true;
             btnPause.Enabled = false;
             btnStop.Enabled = false;
@@ -132,17 +129,34 @@ namespace MainForm
             }
         }
 
-        // ── ISimDelegate ──────────────────────────────────────────────────
+        // ── ISimDelegate ──────────────────────────────────────────────────────
 
         public void Refresh(Event_Core simulation)
         {
             if (InvokeRequired)
-                BeginInvoke(UpdateLabels);
+                BeginInvoke(() => RefreshInternal());
             else
-                UpdateLabels();
+                RefreshInternal();
         }
 
-        // ── Label update ──────────────────────────────────────────────────
+        private void RefreshInternal()
+        {
+            if (_sim == null) return;
+
+            bool isMaxSpeed = chkMaxSpeed.Checked;
+
+            // Pri MaxSpeed iba updatujeme grafy, nie Labels
+            if (isMaxSpeed)
+            {
+                UpdateGlobalStats();
+            }
+            else
+            {
+                UpdateLabels();
+            }
+        }
+
+        // ── Label update ──────────────────────────────────────────────────────
 
         private void UpdateLabels()
         {
@@ -158,7 +172,7 @@ namespace MainForm
                 lblZber1Value, lstRadZber1,
                 _sim.RadPredRontgenom1, _sim.Rontgen1,
                 _sim.Detektor1, _sim.RadPredDetektorom1,
-                _sim.ZberPrepraviek1Volny, _sim.RadPredZberomPrepraviek1);
+                _sim.ZberPrepraviek1Volny, _sim.RadPredZberomPrepraviek1, _sim);
 
             UpdateTerminal(
                 lstQueue2, lblRontgenCestujuci2Value, lblRontgenPrepravka2Value, lstPasPred2, lstPasZa2,
@@ -166,7 +180,7 @@ namespace MainForm
                 lblZber2Value, lstRadZber2,
                 _sim.RadPredRontgenom2, _sim.Rontgen2,
                 _sim.Detektor2, _sim.RadPredDetektorom2,
-                _sim.ZberPrepraviek2Volny, _sim.RadPredZberomPrepraviek2);
+                _sim.ZberPrepraviek2Volny, _sim.RadPredZberomPrepraviek2, _sim);
 
             lblCasVSystemeValue.Text          = _sim.CasVSystemeCollector.Average.ToString("F2");
             lblAvgRadRontgen1Value.Text       = _sim.PocetVRadePredRontgenom1.WeightedAverage.ToString("F4");
@@ -219,9 +233,10 @@ namespace MainForm
             DetektorKovu detektor,
             Queue<Cestujuci> radDetektor,
             bool zberVolny,
-            Queue<Cestujuci> radZber)
+            Queue<Cestujuci> radZber,
+            LetiskoSimulation sim)
         {
-            FillListBox(lstQueue, SafeToArray(rad), c => $"ID {c.ID}");
+            FillListBox(lstQueue, SafeToArray(rad, sim), c => $"ID {c.ID}");
 
             lblRontgenCestujuciValue.Text = rontgen.JeVolnyCestujuci ? "Voľný" : "Zaneprázdnený";
             lblRontgenCestujuciValue.ForeColor = rontgen.JeVolnyCestujuci ? Color.Green : Color.Red;
@@ -229,18 +244,18 @@ namespace MainForm
             lblRontgenPrepravkaValue.Text = rontgen.JeVolnyPrepravka ? "Voľný" : "Zaneprázdnený";
             lblRontgenPrepravkaValue.ForeColor = rontgen.JeVolnyPrepravka ? Color.Green : Color.Red;
 
-            FillListBox(lstPasPred, SafeToArray(rontgen.PrepravkyPredRontgenom), p => $"ID {p.ID}  (ces. {p.ID_Cestujuci})");
-            FillListBox(lstPasZa,   SafeToArray(rontgen.PrepravkyZaRontgenom),   p => $"ID {p.ID}  (ces. {p.ID_Cestujuci})");
+            FillListBox(lstPasPred, SafeToArray(rontgen.PrepravkyPredRontgenom, sim), p => $"ID {p.ID}  (ces. {p.ID_Cestujuci})");
+            FillListBox(lstPasZa,   SafeToArray(rontgen.PrepravkyZaRontgenom, sim),   p => $"ID {p.ID}  (ces. {p.ID_Cestujuci})");
 
             lblDetektorValue.Text = detektor.JeVolny ? "Voľný" : "Zaneprázdnený";
             lblDetektorValue.ForeColor = detektor.JeVolny ? Color.Green : Color.Red;
 
-            FillListBox(lstRadDetektor, SafeToArray(radDetektor), c => $"ID {c.ID}");
+            FillListBox(lstRadDetektor, SafeToArray(radDetektor, sim), c => $"ID {c.ID}");
 
             lblZberValue.Text = zberVolny ? "Voľný" : "Zaneprázdnený";
             lblZberValue.ForeColor = zberVolny ? Color.Green : Color.Red;
 
-            FillListBox(lstRadZber, SafeToArray(radZber), c => $"ID {c.ID}");
+            FillListBox(lstRadZber, SafeToArray(radZber, sim), c => $"ID {c.ID}");
         }
 
         private static void FillListBox<T>(ListBox lb, T[] items, Func<T, string> format)
@@ -248,14 +263,22 @@ namespace MainForm
             lb.BeginUpdate();
             lb.Items.Clear();
             foreach (var item in items)
-                lb.Items.Add(format(item));
+            {
+                if (item != null)
+                    lb.Items.Add(format(item));
+            }
             lb.EndUpdate();
         }
 
-        private static T[] SafeToArray<T>(Queue<T> queue)
+        private static T[] SafeToArray<T>(Queue<T> queue, LetiskoSimulation sim)
         {
-            try { return queue.ToArray(); }
-            catch { return Array.Empty<T>(); }
+            if (queue == null) return [];
+            
+            lock (sim.QueueAccessLock)
+            {
+                try { return queue.ToArray(); }
+                catch { return []; }
+            }
         }
     }
 }

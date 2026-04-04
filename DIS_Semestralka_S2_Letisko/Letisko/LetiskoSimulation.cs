@@ -15,6 +15,9 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
 {
     public class LetiskoSimulation : Event_Core
     {
+        // Synchronization lock for thread-safe queue access
+        public readonly object QueueAccessLock = new();
+
         // Generatory
         public Random GeneratorGeneratorov { get; private set; }
         public RozdelenieSpojite GeneratorRontgenPrepravky { get; private set; }
