@@ -9,8 +9,9 @@ namespace MainForm
     {
         private LetiskoSimulation? _sim;
         private readonly System.Windows.Forms.Timer _refreshTimer = new();
-        private ReplicationForm? _replicationForm;
-        private SimulationForm?  _simulationForm;
+        private readonly List<ReplicationForm> _replicationForms = new();
+        private readonly List<SimulationForm>  _simulationForms  = new();
+        private CancellationTokenSource? _depCts;
 
         public MainForm()
         {
@@ -23,18 +24,18 @@ namespace MainForm
 
         private void btnReplicationStats_Click(object sender, EventArgs e)
         {
-            if (_replicationForm == null || _replicationForm.IsDisposed)
-                _replicationForm = new ReplicationForm();
-            _replicationForm.Show();
-            _replicationForm.BringToFront();
+            var form = new ReplicationForm();
+            _replicationForms.Add(form);
+            form.FormClosed += (s, _) => _replicationForms.Remove((ReplicationForm)s!);
+            form.Show();
         }
 
         private void btnSimulationStats_Click(object sender, EventArgs e)
         {
-            if (_simulationForm == null || _simulationForm.IsDisposed)
-                _simulationForm = new SimulationForm();
-            _simulationForm.Show();
-            _simulationForm.BringToFront();
+            var form = new SimulationForm();
+            _simulationForms.Add(form);
+            form.FormClosed += (s, _) => _simulationForms.Remove((SimulationForm)s!);
+            form.Show();
         }
 
         private void numCestujucich_ValueChanged(object sender, EventArgs e)
@@ -57,7 +58,7 @@ namespace MainForm
             _sim = new LetiskoSimulation(lambda);
             _sim.RegisterDelegate(this);
             ApplySpeedSettings();
-            _simulationForm?.Reset();
+            foreach (var f in _simulationForms) f.Reset();
 
             btnStart.Enabled = false;
             btnPause.Enabled = true;
@@ -78,9 +79,76 @@ namespace MainForm
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            if (_sim == null) return;
-            _sim.Pause = false;
-            _sim.Run = false;
+            if (_sim != null) { _sim.Pause = false; _sim.Run = false; }
+            _depCts?.Cancel();
+        }
+
+        private void chkDependency_CheckedChanged(object sender, EventArgs e)
+        {
+            bool on = chkDependency.Checked;
+            lblTestPointsTitle.Visible = on;
+            numTestPoints.Visible      = on;
+            btnDependency.Visible      = on;
+        }
+
+        private void btnDependency_Click(object sender, EventArgs e)
+        {
+            var depForm = new DependencyForm();
+            depForm.Show();
+
+            btnStart.Enabled      = false;
+            btnDependency.Enabled = false;
+            btnStop.Enabled       = true;
+
+            int baseCestujuci = (int)numCestujucich.Value;
+            int n             = (int)numTestPoints.Value;
+            int replikacii    = (int)numReplikacii.Value;
+
+            double[] factors = ComputeTestFactors(n);
+            _depCts = new CancellationTokenSource();
+            var token = _depCts.Token;
+
+            Task.Run(() =>
+            {
+                foreach (double factor in factors)
+                {
+                    if (token.IsCancellationRequested) break;
+
+                    int cestujuci = Math.Max(1, (int)Math.Round(baseCestujuci * (1.0 + factor)));
+                    double lambda = cestujuci / 86400.0;
+
+                    var sim = new LetiskoSimulation(lambda);
+                    sim.RunSimulation(replikacii);
+
+                    var result = new DependencyResult(
+                        cestujuci, lambda,
+                        sim.GlobalAvgCasVSysteme.Average,
+                        sim.GlobalAvgCasVSysteme.GetConfidenceInterval(),
+                        sim.GlobalAvgRadPredRontgenomSpolu.Average,
+                        sim.GlobalAvgRadPredRontgenomSpolu.GetConfidenceInterval(),
+                        sim.GlobalAvgRadPredDetektoromSpolu.Average,
+                        sim.GlobalAvgRadPredDetektoromSpolu.GetConfidenceInterval(),
+                        sim.GlobalAvgRadPredZberomSpolu.Average,
+                        sim.GlobalAvgRadPredZberomSpolu.GetConfidenceInterval()
+                    );
+
+                    if (!depForm.IsDisposed)
+                        BeginInvoke(() => depForm.AddResult(result));
+                }
+            }).ContinueWith(_ => BeginInvoke(() =>
+            {
+                btnStart.Enabled      = true;
+                btnDependency.Enabled = true;
+                btnStop.Enabled       = false;
+                _depCts = null;
+            }));
+        }
+
+        private static double[] ComputeTestFactors(int n)
+        {
+            if (n == 1) return [0.0];
+            double step = 0.20 / (n - 1);
+            return Enumerable.Range(0, n).Select(i => -0.10 + i * step).ToArray();
         }
 
         private void OnSimulationFinished()
@@ -203,7 +271,7 @@ namespace MainForm
             lblAvgRadZberSpoluValue.Text      = _sim.PocetVRadePredZberomSpolu.WeightedAverage.ToString("F4");
 
             if (!chkMaxSpeed.Checked)
-                _replicationForm?.Update(_sim);
+                foreach (var f in _replicationForms) f.Update(_sim);
 
             UpdateGlobalStats();
         }
@@ -224,7 +292,7 @@ namespace MainForm
             lblGlobalAvgRadDetektorSpoluValue.Text  = rep > 0 ? _sim.GlobalAvgRadPredDetektoromSpolu.Average.ToString("F4"): "—";
             lblGlobalAvgRadZberSpoluValue.Text      = rep > 0 ? _sim.GlobalAvgRadPredZberomSpolu.Average.ToString("F4")    : "—";
 
-            _simulationForm?.Update(_sim);
+            foreach (var f in _simulationForms) f.Update(_sim);
         }
 
         private static void UpdateTerminal(

@@ -21,6 +21,10 @@ namespace MainForm
             btnStop             = new Button();
             btnReplicationStats = new Button();
             btnSimulationStats  = new Button();
+            chkDependency       = new CheckBox();
+            lblTestPointsTitle  = new Label();
+            numTestPoints       = new NumericUpDown();
+            btnDependency       = new Button();
 
             // ── Speed group ───────────────────────────────────────────────────
             grpSpeed      = new GroupBox();
@@ -140,6 +144,7 @@ namespace MainForm
             grpParams.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numReplikacii).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numCestujucich).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numTestPoints).BeginInit();
             grpSpeed.SuspendLayout();
             grpTerminal1.SuspendLayout();
             grpTerminal2.SuspendLayout();
@@ -177,6 +182,29 @@ namespace MainForm
             btnSimulationStats.Size     = new Size(130, 32);
             btnSimulationStats.Text     = "Simulácia...";
             btnSimulationStats.Click   += btnSimulationStats_Click;
+
+            chkDependency.Location       = new Point(615, 20);
+            chkDependency.Size           = new Size(115, 22);
+            chkDependency.Text           = "Závislosť";
+            chkDependency.CheckedChanged += chkDependency_CheckedChanged;
+
+            lblTestPointsTitle.Location = new Point(738, 21);
+            lblTestPointsTitle.Size     = new Size(48, 18);
+            lblTestPointsTitle.Text     = "Body:";
+            lblTestPointsTitle.Visible  = false;
+
+            numTestPoints.Location = new Point(786, 15);
+            numTestPoints.Size     = new Size(58, 26);
+            numTestPoints.Minimum  = 1;
+            numTestPoints.Maximum  = 99;
+            numTestPoints.Value    = 5;
+            numTestPoints.Visible  = false;
+
+            btnDependency.Location = new Point(856, 15);
+            btnDependency.Size     = new Size(160, 32);
+            btnDependency.Text     = "Spustiť závislosť";
+            btnDependency.Visible  = false;
+            btnDependency.Click   += btnDependency_Click;
 
             // ── grpSpeed ──────────────────────────────────────────────────────
             grpSpeed.Location = new Point(15, 160);
@@ -838,6 +866,10 @@ namespace MainForm
             Controls.Add(btnStop);
             Controls.Add(btnReplicationStats);
             Controls.Add(btnSimulationStats);
+            Controls.Add(chkDependency);
+            Controls.Add(lblTestPointsTitle);
+            Controls.Add(numTestPoints);
+            Controls.Add(btnDependency);
             Controls.Add(grpParams);
             Controls.Add(grpSpeed);
             Controls.Add(lblSimTimeTitle);
@@ -852,6 +884,7 @@ namespace MainForm
             grpParams.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)numReplikacii).EndInit();
             ((System.ComponentModel.ISupportInitialize)numCestujucich).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numTestPoints).EndInit();
             grpSpeed.ResumeLayout(false);
             grpTerminal1.ResumeLayout(false);
             grpTerminal2.ResumeLayout(false);
@@ -924,6 +957,12 @@ namespace MainForm
         private Label     lblZber2Value;
         private Label     lblRadZber2Title;
         private ListBox   lstRadZber2;
+
+        // Dependency mode
+        private CheckBox       chkDependency;
+        private Label          lblTestPointsTitle;
+        private NumericUpDown  numTestPoints;
+        private Button         btnDependency;
 
         // Parameters
         private GroupBox       grpParams;

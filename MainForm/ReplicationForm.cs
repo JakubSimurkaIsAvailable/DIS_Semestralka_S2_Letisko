@@ -189,9 +189,13 @@ namespace MainForm
             _dlZber!.Add(sim.RadPredZberomPrepraviek1.Count + sim.RadPredZberomPrepraviek2.Count);
             _dlCas!.Add(sim.CasVSystemeCollector.Average);
 
+            _chartRontgen.Plot.Axes.AutoScale();
             _chartRontgen.Refresh();
+            _chartDetektor.Plot.Axes.AutoScale();
             _chartDetektor.Refresh();
+            _chartZber.Plot.Axes.AutoScale();
             _chartZber.Refresh();
+            _chartCas.Plot.Axes.AutoScale();
             _chartCas.Refresh();
         }
     }
