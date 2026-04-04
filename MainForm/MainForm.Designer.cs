@@ -1,6 +1,6 @@
 namespace MainForm
 {
-    partial class Form1
+    partial class MainForm
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -16,9 +16,11 @@ namespace MainForm
         private void InitializeComponent()
         {
             // ── Buttons ──────────────────────────────────────────────────────
-            btnStart  = new Button();
-            btnPause  = new Button();
-            btnStop   = new Button();
+            btnStart            = new Button();
+            btnPause            = new Button();
+            btnStop             = new Button();
+            btnReplicationStats = new Button();
+            btnSimulationStats  = new Button();
 
             // ── Speed group ───────────────────────────────────────────────────
             grpSpeed      = new GroupBox();
@@ -153,6 +155,16 @@ namespace MainForm
             btnStop.Text     = "Stop";
             btnStop.Enabled  = false;
             btnStop.Click   += btnStop_Click;
+
+            btnReplicationStats.Location = new Point(325, 15);
+            btnReplicationStats.Size     = new Size(130, 32);
+            btnReplicationStats.Text     = "Replikácia...";
+            btnReplicationStats.Click   += btnReplicationStats_Click;
+
+            btnSimulationStats.Location = new Point(465, 15);
+            btnSimulationStats.Size     = new Size(130, 32);
+            btnSimulationStats.Text     = "Simulácia...";
+            btnSimulationStats.Click   += btnSimulationStats_Click;
 
             // ── grpSpeed ──────────────────────────────────────────────────────
             grpSpeed.Location = new Point(15, 60);
@@ -765,6 +777,8 @@ namespace MainForm
             Controls.Add(btnStart);
             Controls.Add(btnPause);
             Controls.Add(btnStop);
+            Controls.Add(btnReplicationStats);
+            Controls.Add(btnSimulationStats);
             Controls.Add(grpSpeed);
             Controls.Add(lblSimTimeTitle);
             Controls.Add(lblSimTimeValue);
@@ -790,6 +804,8 @@ namespace MainForm
         private Button    btnStart;
         private Button    btnPause;
         private Button    btnStop;
+        private Button    btnReplicationStats;
+        private Button    btnSimulationStats;
         private GroupBox  grpSpeed;
         private CheckBox  chkMaxSpeed;
         private Label     lblSleepTitle;

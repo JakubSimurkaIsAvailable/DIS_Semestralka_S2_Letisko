@@ -20,6 +20,24 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
             LetiskoSimulation simulacia = (LetiskoSimulation)Core;
             Cestujuci cestujuci = (Cestujuci)Actor;
             double casPrehliadky = simulacia.GeneratorDetektor.Generate();
+            Queue<Cestujuci> radPredDetektorom;
+            switch (cestujuci.Rad)
+            {
+                case 0:
+                    radPredDetektorom = simulacia.RadPredDetektorom1;
+                    break;
+                case 1:
+                    radPredDetektorom = simulacia.RadPredDetektorom2;
+                    break;
+                default:
+                    throw new InvalidOperationException("Neplatny rad cestujuceho.");
+            }
+            var cestujuciKontrola = radPredDetektorom.Dequeue();
+
+            if (cestujuciKontrola.ID != cestujuci.ID)
+            {
+                throw new InvalidOperationException("Cestujuci na konci kontroly neni cestujuci na konci radu.");
+            }
             simulacia.ScheduleEvent(new EKoniecPrehliadkyDetektor(simulacia, cestujuci), casPrehliadky + simulacia.CurrentTime);
             return simulacia.CurrentTime;
         }

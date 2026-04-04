@@ -5,12 +5,14 @@ using DIS_Semestralka_S2_Letisko.Simulation.Event_Based;
 
 namespace MainForm
 {
-    public partial class Form1 : Form, ISimDelegate
+    public partial class MainForm : Form, ISimDelegate
     {
         private LetiskoSimulation? _sim;
         private readonly System.Windows.Forms.Timer _refreshTimer = new();
+        private ReplicationForm? _replicationForm;
+        private SimulationForm?  _simulationForm;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
             _refreshTimer.Interval = 200;
@@ -18,6 +20,22 @@ namespace MainForm
         }
 
         // ── Simulation control ────────────────────────────────────────────
+
+        private void btnReplicationStats_Click(object sender, EventArgs e)
+        {
+            if (_replicationForm == null || _replicationForm.IsDisposed)
+                _replicationForm = new ReplicationForm();
+            _replicationForm.Show();
+            _replicationForm.BringToFront();
+        }
+
+        private void btnSimulationStats_Click(object sender, EventArgs e)
+        {
+            if (_simulationForm == null || _simulationForm.IsDisposed)
+                _simulationForm = new SimulationForm();
+            _simulationForm.Show();
+            _simulationForm.BringToFront();
+        }
 
         private void btnStart_Click(object sender, EventArgs e)
         {
@@ -30,6 +48,7 @@ namespace MainForm
             _sim = new LetiskoSimulation();
             _sim.RegisterDelegate(this);
             ApplySpeedSettings();
+            _simulationForm?.Reset();
 
             btnStart.Enabled = false;
             btnPause.Enabled = true;
@@ -37,7 +56,7 @@ namespace MainForm
             if (!chkMaxSpeed.Checked)
                 _refreshTimer.Start();
 
-            Task.Run(() => _sim.RunSimulation(10_000))
+            Task.Run(() => _sim.RunSimulation(10_00))
                 .ContinueWith(_ => BeginInvoke(OnSimulationFinished));
         }
 
@@ -160,6 +179,9 @@ namespace MainForm
             lblAvgRadDetektorSpoluValue.Text  = _sim.PocetVRadePredDetektoromSpolu.WeightedAverage.ToString("F4");
             lblAvgRadZberSpoluValue.Text      = _sim.PocetVRadePredZberomSpolu.WeightedAverage.ToString("F4");
 
+            if (!chkMaxSpeed.Checked)
+                _replicationForm?.Update(_sim);
+
             UpdateGlobalStats();
         }
 
@@ -178,6 +200,8 @@ namespace MainForm
             lblGlobalAvgRadRontgenSpoluValue.Text   = rep > 0 ? _sim.GlobalAvgRadPredRontgenomSpolu.Average.ToString("F4") : "—";
             lblGlobalAvgRadDetektorSpoluValue.Text  = rep > 0 ? _sim.GlobalAvgRadPredDetektoromSpolu.Average.ToString("F4"): "—";
             lblGlobalAvgRadZberSpoluValue.Text      = rep > 0 ? _sim.GlobalAvgRadPredZberomSpolu.Average.ToString("F4")    : "—";
+
+            _simulationForm?.Update(_sim);
         }
 
         private static void UpdateTerminal(

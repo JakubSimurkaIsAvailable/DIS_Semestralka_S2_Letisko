@@ -26,7 +26,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
             Prepravka prepravka = (Prepravka)Actor;
             Queue<Cestujuci> radPredZberom;
             bool zberVolny;
-            Prepravka kontrola = Rontgen.PrepravkyPredRontgenom.Dequeue();
+            
 
             switch(Terminal)
             {
@@ -42,10 +42,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
                     throw new Exception("Nespravny terminal");
             }
 
-            if (kontrola.ID != prepravka.ID)
-            {
-                throw new Exception("Nespravna prepravka");
-            }
+
             prepravka.CasUkonceniaRontgenu = simulacia.CurrentTime;
             Rontgen.PrepravkyZaRontgenom.Enqueue(prepravka);
 

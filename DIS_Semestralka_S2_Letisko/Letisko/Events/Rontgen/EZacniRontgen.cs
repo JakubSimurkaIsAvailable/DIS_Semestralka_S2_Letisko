@@ -26,6 +26,11 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
 
             prepravka.CasZaciatkuRontgenu = simulacia.CurrentTime;
             double casKoncaRontgenu = simulacia.CurrentTime + simulacia.GeneratorRontgenPrepravky.Generate();
+            Prepravka kontrola = Rontgen.PrepravkyPredRontgenom.Dequeue();
+            if (kontrola.ID != prepravka.ID)
+            {
+                throw new Exception("Nespravna prepravka");
+            }
             simulacia.ScheduleEvent(new ESkonciRontgen(simulacia, prepravka, Rontgen, Terminal), casKoncaRontgenu);
             return simulacia.CurrentTime;
         }

@@ -57,7 +57,7 @@ namespace DIS_Semestralka_S2_Letisko.Simulation.Event_Based
         {
             Delegates.Add(simDelegate);
         }
-        private void RefreshGUI()
+        protected void RefreshGUI()
         {
             foreach (var simDelegate in Delegates)
             {

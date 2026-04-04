@@ -188,6 +188,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             GlobalAvgRadPredDetektoromSpolu.AddValue(PocetVRadePredDetektoromSpolu.WeightedAverage);
             GlobalAvgRadPredZberomSpolu.AddValue(PocetVRadePredZberomSpolu.WeightedAverage);
             GlobalAvgCasVSysteme.AddValue(CasVSystemeCollector.Average);
+
+            RefreshGUI();
         }
 
         protected override void AfterSimulation()
@@ -202,6 +204,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             Console.WriteLine("Priemer dlzky radu pred zberom prepraviek 2: " + GlobalAvgRadPredZberom2.Average);
             Console.WriteLine("Priemer dlzky radu pred zberom prepraviek (spolu): " + GlobalAvgRadPredZberomSpolu.Average);
             Console.WriteLine("Priemerny cas cestujuceho v systeme: " + GlobalAvgCasVSysteme.Average);
+
+            RefreshGUI();
         }
     }
 }
