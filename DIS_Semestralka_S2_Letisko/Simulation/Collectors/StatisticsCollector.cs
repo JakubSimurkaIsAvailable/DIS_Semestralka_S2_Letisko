@@ -38,7 +38,7 @@ namespace DIS_Semestralka_S2_Letisko.Simulation.Collectors
             
         }
 
-        public (double Lower, double Upper)? GetConfidenceInterval(double z = 1.96)
+        public (double Lower, double Upper)? GetConfidenceInterval(double z = 1.645)
         {
             if (ValueCounter < 30)
                 return null; // malo dat
