@@ -1,6 +1,7 @@
 ﻿using DIS_Semestralka_S2_Letisko.Generators;
 using DIS_Semestralka_S2_Letisko.Generators.Components;
 using DIS_Semestralka_S2_Letisko.Letisko.Actors;
+using DIS_Semestralka_S2_Letisko.Letisko.Events;
 using DIS_Semestralka_S2_Letisko.Letisko.Events.Arrival;
 using DIS_Semestralka_S2_Letisko.Letisko.Objects;
 using DIS_Semestralka_S2_Letisko.Simulation.Collectors;
@@ -122,6 +123,42 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             GlobalAvgCasVSysteme = new StatisticsCollector();
         }
 
+        // Cas v sekundach, kedy sa v replikacii spusti EWarmupEnd a resetuju sa statistiky.
+        // 0 = warmup vypnuty.
+        public double WarmupTime { get; set; }
+
+        public int MaxPasPred { get; set; } = 4;
+        public int MaxPasZa  { get; set; } = 5;
+
+        // Resetuje per-replikacne statistiky od aktualneho casu s aktualnymi hodnotami frontov.
+        // Volane z EWarmupEnd.
+        public void ResetPerReplicationStats()
+        {
+            PocetVRadePredRontgenom1     = new WeightedStatisticsCollector();
+            PocetVRadePredRontgenom2     = new WeightedStatisticsCollector();
+            PocetVRadePredDetektorom1    = new WeightedStatisticsCollector();
+            PocetVRadePredDetektorom2    = new WeightedStatisticsCollector();
+            PocetVRadePredZberom1        = new WeightedStatisticsCollector();
+            PocetVRadePredZberom2        = new WeightedStatisticsCollector();
+            PocetVRadePredRontgenomSpolu    = new WeightedStatisticsCollector();
+            PocetVRadePredDetektoromSpolu   = new WeightedStatisticsCollector();
+            PocetVRadePredZberomSpolu       = new WeightedStatisticsCollector();
+            CasVSystemeCollector            = new StatisticsCollector();
+
+            PocetVRadePredRontgenom1.AddWeightedValue(RadPredRontgenom1.Count, CurrentTime);
+            PocetVRadePredRontgenom2.AddWeightedValue(RadPredRontgenom2.Count, CurrentTime);
+            PocetVRadePredDetektorom1.AddWeightedValue(RadPredDetektorom1.Count, CurrentTime);
+            PocetVRadePredDetektorom2.AddWeightedValue(RadPredDetektorom2.Count, CurrentTime);
+            PocetVRadePredZberom1.AddWeightedValue(RadPredZberomPrepraviek1.Count, CurrentTime);
+            PocetVRadePredZberom2.AddWeightedValue(RadPredZberomPrepraviek2.Count, CurrentTime);
+            PocetVRadePredRontgenomSpolu.AddWeightedValue(
+                RadPredRontgenom1.Count + RadPredRontgenom2.Count, CurrentTime);
+            PocetVRadePredDetektoromSpolu.AddWeightedValue(
+                RadPredDetektorom1.Count + RadPredDetektorom2.Count, CurrentTime);
+            PocetVRadePredZberomSpolu.AddWeightedValue(
+                RadPredZberomPrepraviek1.Count + RadPredZberomPrepraviek2.Count, CurrentTime);
+        }
+
         protected override void BeforeSimulation() { }
 
         protected override void BeforeReplication()
@@ -129,34 +166,35 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             EventQueue = new PriorityQueue<Event, double>();
             CurrentTime = 0;
             PocetCestujucich = 0;
-            // Reset queues and objects
-            RadPredRontgenom1 = new Queue<Cestujuci>();
-            RadPredRontgenom2 = new Queue<Cestujuci>();
-            Rontgen1 = new Rontgen(4, 5);
-            Rontgen2 = new Rontgen(4, 5);
-            RadPredDetektorom1 = new Queue<Cestujuci>();
-            RadPredDetektorom2 = new Queue<Cestujuci>();
-            Detektor1 = new DetektorKovu();
-            Detektor2 = new DetektorKovu();
+            RadPredRontgenom1        = new Queue<Cestujuci>();
+            RadPredRontgenom2        = new Queue<Cestujuci>();
+            Rontgen1                 = new Rontgen(MaxPasPred, MaxPasZa);
+            Rontgen2                 = new Rontgen(MaxPasPred, MaxPasZa);
+            RadPredDetektorom1       = new Queue<Cestujuci>();
+            RadPredDetektorom2       = new Queue<Cestujuci>();
+            Detektor1                = new DetektorKovu();
+            Detektor2                = new DetektorKovu();
             RadPredZberomPrepraviek1 = new Queue<Cestujuci>();
             RadPredZberomPrepraviek2 = new Queue<Cestujuci>();
-            ZberPrepraviek1Volny = true;
-            ZberPrepraviek2Volny = true;
+            ZberPrepraviek1Volny     = true;
+            ZberPrepraviek2Volny     = true;
+            TimeLimit = 60 * 60 * 24 + WarmupTime;
             double firstArrival = GeneratorPrichodov.Generate();
             ScheduleEvent(new EPrichodCestujuceho(this, new Cestujuci(firstArrival, PocetCestujucich)), firstArrival);
+            if (WarmupTime > 0)
+                ScheduleEvent(new EWarmupEnd(this), WarmupTime);
             if (Slowdown)
                 ScheduleEvent(new SleepEvent(this, Length), 0);
-            PocetVRadePredRontgenom1 = new WeightedStatisticsCollector();
-            PocetVRadePredRontgenom2 = new WeightedStatisticsCollector();
-            PocetVRadePredDetektorom1 = new WeightedStatisticsCollector();
-            PocetVRadePredDetektorom2 = new WeightedStatisticsCollector();
-            PocetVRadePredZberom1 = new WeightedStatisticsCollector();
-            PocetVRadePredZberom2 = new WeightedStatisticsCollector();
-            PocetVRadePredRontgenomSpolu = new WeightedStatisticsCollector();
-            PocetVRadePredDetektoromSpolu = new WeightedStatisticsCollector();
-            PocetVRadePredZberomSpolu = new WeightedStatisticsCollector();
-            CasVSystemeCollector = new StatisticsCollector();
-
+            PocetVRadePredRontgenom1     = new WeightedStatisticsCollector();
+            PocetVRadePredRontgenom2     = new WeightedStatisticsCollector();
+            PocetVRadePredDetektorom1    = new WeightedStatisticsCollector();
+            PocetVRadePredDetektorom2    = new WeightedStatisticsCollector();
+            PocetVRadePredZberom1        = new WeightedStatisticsCollector();
+            PocetVRadePredZberom2        = new WeightedStatisticsCollector();
+            PocetVRadePredRontgenomSpolu    = new WeightedStatisticsCollector();
+            PocetVRadePredDetektoromSpolu   = new WeightedStatisticsCollector();
+            PocetVRadePredZberomSpolu       = new WeightedStatisticsCollector();
+            CasVSystemeCollector            = new StatisticsCollector();
             PocetVRadePredRontgenom1.AddWeightedValue(0, 0);
             PocetVRadePredRontgenom2.AddWeightedValue(0, 0);
             PocetVRadePredDetektorom1.AddWeightedValue(0, 0);
