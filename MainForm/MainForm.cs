@@ -1,6 +1,7 @@
 using DIS_Semestralka_S2_Letisko.Letisko;
 using DIS_Semestralka_S2_Letisko.Letisko.Actors;
 using DIS_Semestralka_S2_Letisko.Letisko.Objects;
+using DIS_Semestralka_S2_Letisko.Simulation.Collectors;
 using DIS_Semestralka_S2_Letisko.Simulation.Event_Based;
 
 namespace MainForm
@@ -12,6 +13,7 @@ namespace MainForm
         private readonly List<ReplicationForm> _replicationForms = new();
         private readonly List<SimulationForm>  _simulationForms  = new();
         private CancellationTokenSource? _depCts;
+        private StreamWriter? _csvWriter;
 
         public MainForm()
         {
@@ -44,30 +46,137 @@ namespace MainForm
             lblLambdaValue.Text = $"{lambda:F6} /s";
         }
 
+        private void chkWarmup_CheckedChanged(object sender, EventArgs e)
+        {
+            lblWarmupTimeTitle.Visible = chkWarmup.Checked;
+            numWarmupTime.Visible      = chkWarmup.Checked;
+        }
+
+        private void chkProgressiveLambda_CheckedChanged(object sender, EventArgs e)
+        {
+            bool on = chkProgressiveLambda.Checked;
+            // progresívny riadok
+            lblOdTitle.Visible        = on;
+            numCestujucichOd.Visible  = on;
+            lblDoTitle.Visible        = on;
+            numCestujucichDo.Visible  = on;
+            // fixný riadok
+            lblCestujucichTitle.Visible = !on;
+            numCestujucich.Visible      = !on;
+            lblLambdaTitle.Visible      = !on;
+            lblLambdaValue.Visible      = !on;
+        }
+
         private void btnStart_Click(object sender, EventArgs e)
         {
-            if (_sim != null)
-            {
-                _sim.Pause = false;
-                _sim.Run = false;
-            }
+            if (chkProgressiveLambda.Checked)
+                StartProgressiveRun();
+            else
+                StartNormalRun();
+        }
 
-            double lambda = (double)numCestujucich.Value / 86400.0;
+        private void StartNormalRun()
+        {
+            if (_sim != null) { _sim.Pause = false; _sim.Run = false; }
+
+            double lambda  = (double)numCestujucich.Value / 86400.0;
             int replikacii = chkMaxSpeed.Checked ? (int)numReplikacii.Value : 1;
 
             _sim = new LetiskoSimulation(lambda);
+            _sim.WarmupTime = chkWarmup.Checked ? (double)numWarmupTime.Value : 0;
+            _sim.MaxPasPred = (int)numMaxPasPred.Value;
+            _sim.MaxPasZa   = (int)numMaxPasZa.Value;
             _sim.RegisterDelegate(this);
             ApplySpeedSettings();
             foreach (var f in _simulationForms) f.Reset();
 
+            // Inkrementálny CSV záznam — iba v slowdown móde (1 replikácia)
+            if (chkSaveCsv.Checked && !chkMaxSpeed.Checked)
+                OpenIncrementalCsv();
+
             btnStart.Enabled = false;
             btnPause.Enabled = true;
-            btnStop.Enabled = true;
+            btnStop.Enabled  = true;
             if (!chkMaxSpeed.Checked)
                 _refreshTimer.Start();
 
             Task.Run(() => _sim.RunSimulation(replikacii))
                 .ContinueWith(_ => BeginInvoke(OnSimulationFinished));
+        }
+
+        private void StartProgressiveRun()
+        {
+            btnStart.Enabled = false;
+            btnStop.Enabled  = true;
+
+            int odCestujuci = (int)numCestujucichOd.Value;
+            int doCestujuci = (int)numCestujucichDo.Value;
+            int replikacii  = (int)numReplikacii.Value;
+            int maxPasPred  = (int)numMaxPasPred.Value;
+            int maxPasZa    = (int)numMaxPasZa.Value;
+
+            _depCts = new CancellationTokenSource();
+            var token = _depCts.Token;
+
+            var rows = new List<string[]>();
+
+            Task.Run(() =>
+            {
+                for (int i = 0; i < replikacii; i++)
+                {
+                    if (token.IsCancellationRequested) break;
+
+                    int cestujuci = replikacii == 1
+                        ? odCestujuci
+                        : odCestujuci + (int)Math.Round((double)(doCestujuci - odCestujuci) * i / (replikacii - 1));
+                    double lambda = cestujuci / 86400.0;
+
+                    var sim = new LetiskoSimulation(lambda);
+                    sim.MaxPasPred = maxPasPred;
+                    sim.MaxPasZa   = maxPasZa;
+                    sim.RunSimulation(1);
+
+                    rows.Add([
+                        (i + 1).ToString(),
+                        cestujuci.ToString(),
+                        lambda.ToString("F6", System.Globalization.CultureInfo.InvariantCulture),
+                        sim.GlobalAvgCasVSysteme.Average.ToString("F4", System.Globalization.CultureInfo.InvariantCulture),
+                        sim.GlobalAvgRadPredRontgenomSpolu.Average.ToString("F4", System.Globalization.CultureInfo.InvariantCulture),
+                        sim.GlobalAvgRadPredDetektoromSpolu.Average.ToString("F4", System.Globalization.CultureInfo.InvariantCulture),
+                        sim.GlobalAvgRadPredZberomSpolu.Average.ToString("F4", System.Globalization.CultureInfo.InvariantCulture)
+                    ]);
+                }
+            }).ContinueWith(_ => BeginInvoke(() =>
+            {
+                btnStart.Enabled = true;
+                btnStop.Enabled  = false;
+                _depCts = null;
+
+                if (rows.Count > 0)
+                    SaveProgressiveCsv(rows);
+            }));
+        }
+
+        private void SaveProgressiveCsv(List<string[]> rows)
+        {
+            using var dlg = new SaveFileDialog
+            {
+                Title      = "Uložiť výsledky progresívnej lambdy",
+                Filter     = "CSV súbory (*.csv)|*.csv|Všetky súbory (*.*)|*.*",
+                FileName   = $"progressive_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                DefaultExt = "csv"
+            };
+
+            if (dlg.ShowDialog() != DialogResult.OK) return;
+
+            var lines = new List<string>
+            {
+                "Replikacia,Cestujuci,Lambda,CasVSysteme,RadRontgen,RadDetektor,RadZber"
+            };
+            lines.AddRange(rows.Select(r => string.Join(",", r)));
+
+            File.WriteAllLines(dlg.FileName, lines, System.Text.Encoding.UTF8);
+            MessageBox.Show($"Uložené: {dlg.FileName}", "Hotovo", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void btnPause_Click(object sender, EventArgs e)
@@ -103,6 +212,8 @@ namespace MainForm
             int baseCestujuci = (int)numCestujucich.Value;
             int n             = (int)numTestPoints.Value;
             int replikacii    = (int)numReplikacii.Value;
+            int maxPasPred    = (int)numMaxPasPred.Value;
+            int maxPasZa      = (int)numMaxPasZa.Value;
 
             double[] factors = ComputeTestFactors(n);
             _depCts = new CancellationTokenSource();
@@ -118,6 +229,8 @@ namespace MainForm
                     double lambda = cestujuci / 86400.0;
 
                     var sim = new LetiskoSimulation(lambda);
+                    sim.MaxPasPred = maxPasPred;
+                    sim.MaxPasZa   = maxPasZa;
                     sim.RunSimulation(replikacii);
 
                     var result = new DependencyResult(
@@ -159,6 +272,96 @@ namespace MainForm
             btnPause.Enabled = false;
             btnStop.Enabled = false;
             btnPause.Text = "Pause";
+
+            if (_csvWriter != null)
+            {
+                // Inkrementálny CSV — zavrieme súbor
+                _csvWriter.Flush();
+                _csvWriter.Close();
+                _csvWriter = null;
+            }
+            else if (chkSaveCsv.Checked && _sim != null)
+            {
+                // MaxSpeed mód — uložíme globálne štatistiky na konci
+                SaveSimulationCsv(_sim);
+            }
+        }
+
+        private void OpenIncrementalCsv()
+        {
+            using var dlg = new SaveFileDialog
+            {
+                Title      = "Uložiť priebežné dáta simulácie",
+                Filter     = "CSV súbory (*.csv)|*.csv|Všetky súbory (*.*)|*.*",
+                FileName   = $"simulation_priebeh_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                DefaultExt = "csv"
+            };
+            if (dlg.ShowDialog() != DialogResult.OK) return;
+
+            _csvWriter = new StreamWriter(dlg.FileName, false, System.Text.Encoding.UTF8);
+            _csvWriter.WriteLine("SimCas,RadRontgen1,RadRontgen2,RadRontgenSpolu," +
+                                 "RadDetektor1,RadDetektor2,RadDetektorSpolu," +
+                                 "RadZber1,RadZber2,RadZberSpolu,AvgCasVSysteme");
+        }
+
+        private void AppendCsvRow()
+        {
+            if (_csvWriter == null || _sim == null) return;
+
+            static string F(double v) => v.ToString("F4", System.Globalization.CultureInfo.InvariantCulture);
+            double t = Math.Max(0, _sim.CurrentTime - _sim.WarmupTime);
+            string time = $"{(int)(t / 3600):D2}:{(int)(t / 60) % 60:D2}:{(int)(t % 60):D2}";
+
+            _csvWriter.WriteLine(string.Join(",",
+                time,
+                F(_sim.PocetVRadePredRontgenom1.WeightedAverage),
+                F(_sim.PocetVRadePredRontgenom2.WeightedAverage),
+                F(_sim.PocetVRadePredRontgenomSpolu.WeightedAverage),
+                F(_sim.PocetVRadePredDetektorom1.WeightedAverage),
+                F(_sim.PocetVRadePredDetektorom2.WeightedAverage),
+                F(_sim.PocetVRadePredDetektoromSpolu.WeightedAverage),
+                F(_sim.PocetVRadePredZberom1.WeightedAverage),
+                F(_sim.PocetVRadePredZberom2.WeightedAverage),
+                F(_sim.PocetVRadePredZberomSpolu.WeightedAverage),
+                F(_sim.CasVSystemeCollector.Average)));
+        }
+
+        private void SaveSimulationCsv(LetiskoSimulation sim)
+        {
+            using var dlg = new SaveFileDialog
+            {
+                Title      = "Uložiť výsledky simulácie",
+                Filter     = "CSV súbory (*.csv)|*.csv|Všetky súbory (*.*)|*.*",
+                FileName   = $"simulation_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                DefaultExt = "csv"
+            };
+            if (dlg.ShowDialog() != DialogResult.OK) return;
+
+            static string Fmt(double v) => v.ToString("F4", System.Globalization.CultureInfo.InvariantCulture);
+            static string CiStr((double Lower, double Upper)? ci) =>
+                ci.HasValue ? $"{Fmt(ci.Value.Lower)},{Fmt(ci.Value.Upper)}" : ",";
+
+            var lines = new List<string>
+            {
+                "Metrika,Priemer,CI_Dolny,CI_Horny"
+            };
+
+            void AddRow(string name, StatisticsCollector col)
+                => lines.Add($"{name},{Fmt(col.Average)},{CiStr(col.GetConfidenceInterval())}");
+
+            AddRow("CasVSysteme",             sim.GlobalAvgCasVSysteme);
+            AddRow("RadRontgen1",             sim.GlobalAvgRadPredRontgenom1);
+            AddRow("RadRontgen2",             sim.GlobalAvgRadPredRontgenom2);
+            AddRow("RadRontgenSpolu",         sim.GlobalAvgRadPredRontgenomSpolu);
+            AddRow("RadDetektor1",            sim.GlobalAvgRadPredDetektorom1);
+            AddRow("RadDetektor2",            sim.GlobalAvgRadPredDetektorom2);
+            AddRow("RadDetektorSpolu",        sim.GlobalAvgRadPredDetektoromSpolu);
+            AddRow("RadZber1",                sim.GlobalAvgRadPredZberom1);
+            AddRow("RadZber2",                sim.GlobalAvgRadPredZberom2);
+            AddRow("RadZberSpolu",            sim.GlobalAvgRadPredZberomSpolu);
+
+            File.WriteAllLines(dlg.FileName, lines, System.Text.Encoding.UTF8);
+            MessageBox.Show($"Uložené: {dlg.FileName}", "Hotovo", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // ── Speed controls ────────────────────────────────────────────────
@@ -211,9 +414,9 @@ namespace MainForm
         public void Refresh(Event_Core simulation)
         {
             if (InvokeRequired)
-                BeginInvoke(() => RefreshInternal());
+                BeginInvoke(() => { RefreshInternal(); AppendCsvRow(); });
             else
-                RefreshInternal();
+            { RefreshInternal(); AppendCsvRow(); }
         }
 
         private void RefreshInternal()
@@ -239,7 +442,7 @@ namespace MainForm
         {
             if (_sim == null) return;
 
-            double t = _sim.CurrentTime;
+            double t = Math.Max(0, _sim.CurrentTime - _sim.WarmupTime);
             lblSimTimeValue.Text = $"{(int)(t / 3600):D2}:{(int)(t / 60) % 60:D2}:{(int)(t % 60):D2}";
             lblPocetValue.Text = _sim.PocetCestujucich.ToString();
 

@@ -25,6 +25,10 @@ namespace MainForm
             lblTestPointsTitle  = new Label();
             numTestPoints       = new NumericUpDown();
             btnDependency       = new Button();
+            chkSaveCsv          = new CheckBox();
+            chkWarmup           = new CheckBox();
+            lblWarmupTimeTitle  = new Label();
+            numWarmupTime       = new NumericUpDown();
 
             // ── Speed group ───────────────────────────────────────────────────
             grpSpeed      = new GroupBox();
@@ -112,13 +116,24 @@ namespace MainForm
             lblGlobalAvgRadZberSpoluValue       = new Label();
 
             // ── Parameters group ─────────────────────────────────────────────
-            grpParams            = new GroupBox();
-            lblReplikaciiTitle   = new Label();
-            numReplikacii        = new NumericUpDown();
-            lblCestujucichTitle  = new Label();
-            numCestujucich       = new NumericUpDown();
-            lblLambdaTitle       = new Label();
-            lblLambdaValue       = new Label();
+            grpParams              = new GroupBox();
+            lblReplikaciiTitle     = new Label();
+            numReplikacii          = new NumericUpDown();
+            chkProgressiveLambda   = new CheckBox();
+            lblCestujucichTitle    = new Label();
+            numCestujucich         = new NumericUpDown();
+            lblLambdaTitle         = new Label();
+            lblLambdaValue         = new Label();
+            lblOdTitle             = new Label();
+            numCestujucichOd       = new NumericUpDown();
+            lblDoTitle             = new Label();
+            numCestujucichDo       = new NumericUpDown();
+
+            // ── Röntgen belt size ─────────────────────────────────────────────
+            lblMaxPasPredTitle = new Label();
+            numMaxPasPred      = new NumericUpDown();
+            lblMaxPasZaTitle   = new Label();
+            numMaxPasZa        = new NumericUpDown();
 
             // ── Terminal 2 ────────────────────────────────────────────────────
             grpTerminal2                = new GroupBox();
@@ -145,6 +160,10 @@ namespace MainForm
             ((System.ComponentModel.ISupportInitialize)numReplikacii).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numCestujucich).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTestPoints).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numCestujucichOd).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numCestujucichDo).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numMaxPasPred).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numMaxPasZa).BeginInit();
             grpSpeed.SuspendLayout();
             grpTerminal1.SuspendLayout();
             grpTerminal2.SuspendLayout();
@@ -205,6 +224,33 @@ namespace MainForm
             btnDependency.Text     = "Spustiť závislosť";
             btnDependency.Visible  = false;
             btnDependency.Click   += btnDependency_Click;
+
+            // chkSaveCsv
+            chkSaveCsv.Location = new Point(640, 70);
+            chkSaveCsv.Size     = new Size(220, 22);
+            chkSaveCsv.Text     = "Uložiť výsledky do CSV";
+
+            // chkWarmup
+            chkWarmup.Location       = new Point(640, 95);
+            chkWarmup.Size           = new Size(150, 22);
+            chkWarmup.Text           = "Zahriatie (warmup)";
+            chkWarmup.CheckedChanged += chkWarmup_CheckedChanged;
+
+            // lblWarmupTimeTitle
+            lblWarmupTimeTitle.Location = new Point(795, 96);
+            lblWarmupTimeTitle.Size     = new Size(30, 20);
+            lblWarmupTimeTitle.Text     = "t =";
+            lblWarmupTimeTitle.Visible  = false;
+
+            // numWarmupTime
+            ((System.ComponentModel.ISupportInitialize)numWarmupTime).BeginInit();
+            numWarmupTime.Location  = new Point(825, 93);
+            numWarmupTime.Size      = new Size(90, 26);
+            numWarmupTime.Minimum   = 0;
+            numWarmupTime.Maximum   = 86400;
+            numWarmupTime.Value     = 3600;
+            numWarmupTime.Visible   = false;
+            ((System.ComponentModel.ISupportInitialize)numWarmupTime).EndInit();
 
             // ── grpSpeed ──────────────────────────────────────────────────────
             grpSpeed.Location = new Point(15, 160);
@@ -298,7 +344,7 @@ namespace MainForm
             // ── Parameters GroupBox ───────────────────────────────────────────
             // ══════════════════════════════════════════════════════════════════
             grpParams.Location = new Point(15, 60);
-            grpParams.Size     = new Size(600, 90);
+            grpParams.Size     = new Size(600, 120);
             grpParams.Text     = "Parametre simulácie";
 
             lblReplikaciiTitle.Location = new Point(12, 25);
@@ -311,6 +357,11 @@ namespace MainForm
             numReplikacii.Minimum  = 1;
             numReplikacii.Maximum  = 1000000;
             numReplikacii.Value    = 1000;
+
+            chkProgressiveLambda.Location       = new Point(315, 25);
+            chkProgressiveLambda.Size           = new Size(260, 22);
+            chkProgressiveLambda.Text           = "Progresívna lambda (Od → Do → CSV)";
+            chkProgressiveLambda.CheckedChanged += chkProgressiveLambda_CheckedChanged;
 
             lblCestujucichTitle.Location = new Point(12, 57);
             lblCestujucichTitle.Size     = new Size(160, 20);
@@ -334,12 +385,71 @@ namespace MainForm
             lblLambdaValue.Text     = "0.066667 /s";
             lblLambdaValue.Font     = fStatus;
 
+            // Od / Do — viditeľné iba v progresívnom móde
+            lblOdTitle.Location = new Point(12, 57);
+            lblOdTitle.Size     = new Size(110, 20);
+            lblOdTitle.Text     = "Od (ces./deň):";
+            lblOdTitle.Font     = fTitle;
+            lblOdTitle.Visible  = false;
+
+            numCestujucichOd.Location = new Point(128, 54);
+            numCestujucichOd.Size     = new Size(95, 26);
+            numCestujucichOd.Minimum  = 1;
+            numCestujucichOd.Maximum  = 1000000;
+            numCestujucichOd.Value    = 4000;
+            numCestujucichOd.Visible  = false;
+
+            lblDoTitle.Location = new Point(238, 57);
+            lblDoTitle.Size     = new Size(30, 20);
+            lblDoTitle.Text     = "Do:";
+            lblDoTitle.Font     = fTitle;
+            lblDoTitle.Visible  = false;
+
+            numCestujucichDo.Location = new Point(273, 54);
+            numCestujucichDo.Size     = new Size(95, 26);
+            numCestujucichDo.Minimum  = 1;
+            numCestujucichDo.Maximum  = 1000000;
+            numCestujucichDo.Value    = 6000;
+            numCestujucichDo.Visible  = false;
+
+            // Belt size row (3rd row in grpParams)
+            lblMaxPasPredTitle.Location = new Point(12, 90);
+            lblMaxPasPredTitle.Size     = new Size(130, 20);
+            lblMaxPasPredTitle.Text     = "Max pas pred:";
+            lblMaxPasPredTitle.Font     = fTitle;
+
+            numMaxPasPred.Location = new Point(148, 87);
+            numMaxPasPred.Size     = new Size(70, 26);
+            numMaxPasPred.Minimum  = 1;
+            numMaxPasPred.Maximum  = 50;
+            numMaxPasPred.Value    = 4;
+
+            lblMaxPasZaTitle.Location = new Point(235, 90);
+            lblMaxPasZaTitle.Size     = new Size(130, 20);
+            lblMaxPasZaTitle.Text     = "Max pas za:";
+            lblMaxPasZaTitle.Font     = fTitle;
+
+            numMaxPasZa.Location = new Point(371, 87);
+            numMaxPasZa.Size     = new Size(70, 26);
+            numMaxPasZa.Minimum  = 1;
+            numMaxPasZa.Maximum  = 50;
+            numMaxPasZa.Value    = 5;
+
             grpParams.Controls.Add(lblReplikaciiTitle);
             grpParams.Controls.Add(numReplikacii);
+            grpParams.Controls.Add(chkProgressiveLambda);
             grpParams.Controls.Add(lblCestujucichTitle);
             grpParams.Controls.Add(numCestujucich);
             grpParams.Controls.Add(lblLambdaTitle);
             grpParams.Controls.Add(lblLambdaValue);
+            grpParams.Controls.Add(lblOdTitle);
+            grpParams.Controls.Add(numCestujucichOd);
+            grpParams.Controls.Add(lblDoTitle);
+            grpParams.Controls.Add(numCestujucichDo);
+            grpParams.Controls.Add(lblMaxPasPredTitle);
+            grpParams.Controls.Add(numMaxPasPred);
+            grpParams.Controls.Add(lblMaxPasZaTitle);
+            grpParams.Controls.Add(numMaxPasZa);
 
             // ══════════════════════════════════════════════════════════════════
             // ── Terminal 1 GroupBox ───────────────────────────────────────────
@@ -880,11 +990,19 @@ namespace MainForm
             Controls.Add(grpTerminal2);
             Controls.Add(grpStats);
             Controls.Add(grpGlobalStats);
+            Controls.Add(chkSaveCsv);
+            Controls.Add(chkWarmup);
+            Controls.Add(lblWarmupTimeTitle);
+            Controls.Add(numWarmupTime);
 
             grpParams.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)numReplikacii).EndInit();
             ((System.ComponentModel.ISupportInitialize)numCestujucich).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTestPoints).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numCestujucichOd).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numCestujucichDo).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numMaxPasPred).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numMaxPasZa).EndInit();
             grpSpeed.ResumeLayout(false);
             grpTerminal1.ResumeLayout(false);
             grpTerminal2.ResumeLayout(false);
@@ -958,6 +1076,12 @@ namespace MainForm
         private Label     lblRadZber2Title;
         private ListBox   lstRadZber2;
 
+        // CSV export
+        private CheckBox       chkSaveCsv;
+        private CheckBox       chkWarmup;
+        private Label          lblWarmupTimeTitle;
+        private NumericUpDown  numWarmupTime;
+
         // Dependency mode
         private CheckBox       chkDependency;
         private Label          lblTestPointsTitle;
@@ -968,10 +1092,19 @@ namespace MainForm
         private GroupBox       grpParams;
         private Label          lblReplikaciiTitle;
         private NumericUpDown  numReplikacii;
+        private CheckBox       chkProgressiveLambda;
+        private Label          lblOdTitle;
+        private NumericUpDown  numCestujucichOd;
+        private Label          lblDoTitle;
+        private NumericUpDown  numCestujucichDo;
         private Label          lblCestujucichTitle;
         private NumericUpDown  numCestujucich;
         private Label          lblLambdaTitle;
         private Label          lblLambdaValue;
+        private Label          lblMaxPasPredTitle;
+        private NumericUpDown  numMaxPasPred;
+        private Label          lblMaxPasZaTitle;
+        private NumericUpDown  numMaxPasZa;
 
         // Statistics (per-replication)
         private GroupBox  grpStats;
