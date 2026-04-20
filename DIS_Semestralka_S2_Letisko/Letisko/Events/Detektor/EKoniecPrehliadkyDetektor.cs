@@ -48,13 +48,6 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
                 simulacia.ScheduleEvent(new EZaciatokOsobnejPrehliadky(simulacia, cestujuci), simulacia.CurrentTime);
             } else
             {
-                //radPredDetektorom.Dequeue();
-                if (cestujuci.Rad == 0)
-                    simulacia.PocetVRadePredDetektorom1.AddWeightedValue(radPredDetektorom.Count, simulacia.CurrentTime);
-                else
-                    simulacia.PocetVRadePredDetektorom2.AddWeightedValue(radPredDetektorom.Count, simulacia.CurrentTime);
-                simulacia.PocetVRadePredDetektoromSpolu.AddWeightedValue(simulacia.RadPredDetektorom1.Count + simulacia.RadPredDetektorom2.Count, simulacia.CurrentTime);
-                
                 if (radPredDetektorom.Count > 0)
                 {
                     Cestujuci dalsiCestujuci = radPredDetektorom.Peek();
@@ -67,7 +60,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
                 }
                 if (cestujuci.MaxPocetPrepraviek > 0)
                 {
-                    
+                    cestujuci.CasPrichoduPriZbere = simulacia.CurrentTime;
                     if (cestujuci.Rad == 0)
                         simulacia.PocetVRadePredZberom1.AddWeightedValue(radPredZberomPrepraviek.Count, simulacia.CurrentTime);
                     else

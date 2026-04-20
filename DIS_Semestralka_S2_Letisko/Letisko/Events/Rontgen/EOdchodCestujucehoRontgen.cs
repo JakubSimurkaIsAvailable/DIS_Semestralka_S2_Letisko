@@ -48,6 +48,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
             {
                 throw new Exception("Cestujuci sa nezhoduje");
             }
+            simulacia.CasVRadePredRontgenomCollector.AddValue(
+                simulacia.CurrentTime - cestujuci.CasPrichodu);
 
             if (cestujuci.Rad == 0)
                 simulacia.PocetVRadePredRontgenom1.AddWeightedValue(rad.Count, simulacia.CurrentTime);
@@ -68,6 +70,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
                 rontgen.JeVolnyCestujuci = true;
             }
 
+            cestujuci.CasPrichoduPriDetektore = simulacia.CurrentTime;
             if (detektor.JeVolny)
             {
                 detektor.JeVolny = false;

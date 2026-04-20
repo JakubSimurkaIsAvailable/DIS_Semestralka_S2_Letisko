@@ -17,6 +17,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
     public class LetiskoSimulation : Event_Core
     {
         // Synchronization lock for thread-safe queue access
+        // 2.1.9
         public readonly object QueueAccessLock = new();
 
         // Generatory
@@ -47,6 +48,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
         public bool ZberPrepraviek2Volny { get; set; }
         // ------------------------------
 
+        //2.5.1
         // --------= Statistiky (per replikacia) =--------
         public WeightedStatisticsCollector PocetVRadePredRontgenom1 { get; private set; }
         public WeightedStatisticsCollector PocetVRadePredRontgenom2 { get; private set; }
@@ -57,9 +59,21 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
         public WeightedStatisticsCollector PocetVRadePredRontgenomSpolu { get; private set; }
         public WeightedStatisticsCollector PocetVRadePredDetektoromSpolu { get; private set; }
         public WeightedStatisticsCollector PocetVRadePredZberomSpolu { get; private set; }
+        // Pasy (vstupný / výstupný pas röntgenu)
+        public WeightedStatisticsCollector PocetVPasPredRontgenom1 { get; private set; }
+        public WeightedStatisticsCollector PocetVPasPredRontgenom2 { get; private set; }
+        public WeightedStatisticsCollector PocetVPasPredRontgenomSpolu { get; private set; }
+        public WeightedStatisticsCollector PocetVPasZaRontgenom1 { get; private set; }
+        public WeightedStatisticsCollector PocetVPasZaRontgenom2 { get; private set; }
+        public WeightedStatisticsCollector PocetVPasZaRontgenomSpolu { get; private set; }
         public StatisticsCollector CasVSystemeCollector { get; private set; }
+        public StatisticsCollector CasVRadePredRontgenomCollector { get; private set; }
+        public StatisticsCollector CasVRadePredDetektoromCollector { get; private set; }
+        public StatisticsCollector CasVRadePredZberomCollector { get; private set; }
+        public StatisticsCollector CasVPasPredRontgenomCollector { get; private set; }
+        public StatisticsCollector CasVPasZaRontgenomCollector { get; private set; }
         // -----------------------------------------------
-
+        //2.5.1
         // --------= Globalne statistiky (napriec replikaciami) =--------
         public StatisticsCollector GlobalAvgRadPredRontgenom1 { get; private set; }
         public StatisticsCollector GlobalAvgRadPredRontgenom2 { get; private set; }
@@ -70,13 +84,33 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
         public StatisticsCollector GlobalAvgRadPredRontgenomSpolu { get; private set; }
         public StatisticsCollector GlobalAvgRadPredDetektoromSpolu { get; private set; }
         public StatisticsCollector GlobalAvgRadPredZberomSpolu { get; private set; }
+        public StatisticsCollector GlobalAvgPasPredRontgenom1 { get; private set; }
+        public StatisticsCollector GlobalAvgPasPredRontgenom2 { get; private set; }
+        public StatisticsCollector GlobalAvgPasPredRontgenomSpolu { get; private set; }
+        public StatisticsCollector GlobalAvgPasZaRontgenom1 { get; private set; }
+        public StatisticsCollector GlobalAvgPasZaRontgenom2 { get; private set; }
+        public StatisticsCollector GlobalAvgPasZaRontgenomSpolu { get; private set; }
         public StatisticsCollector GlobalAvgCasVSysteme { get; private set; }
+        public StatisticsCollector GlobalAvgCasVRadePredRontgenom { get; private set; }
+        public StatisticsCollector GlobalAvgCasVRadePredDetektorom { get; private set; }
+        public StatisticsCollector GlobalAvgCasVRadePredZberom { get; private set; }
+        public StatisticsCollector GlobalAvgCasVPasPredRontgenom { get; private set; }
+        public StatisticsCollector GlobalAvgCasVPasZaRontgenom { get; private set; }
         // --------------------------------------------------------------
 
-        public LetiskoSimulation(double lambda)
+        // Trvanie jednej replikácie v sekundách (bez warmup). Default = 1 deň.
+        public double SimDuration { get; set; } = 86400;
+
+        // Ak je nastavené, ECollectData zapisuje pozorovania pre Welchovu analýzu.
+        public TextWriter? CsvOutput { get; set; }
+        // Interval zberu v sekundách (0 = vypnutý).
+        public double CollectInterval { get; set; } = 0;
+        private int _obsIndex;
+
+        public LetiskoSimulation(double lambda, int? seed = null)
         {
             // ----------------------- Generatory ----------------------
-            GeneratorGeneratorov = new Random();
+            GeneratorGeneratorov = seed.HasValue ? new Random(seed.Value) : new Random();
             GeneratorRontgenPrepravky = new RozdelenieSpojite(GeneratorGeneratorov, 9, 46);
             GeneratorPrichodov = new ExponencialnyGenerator(GeneratorGeneratorov, lambda);
             GeneratorDetektor = new RozdelenieSpojite(GeneratorGeneratorov, 6, 27);
@@ -99,6 +133,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             RadPredZberomPrepraviek2 = new Queue<Cestujuci>();
             ZberPrepraviek2Volny = true;
             TimeLimit = 60 * 60 * 24; //60 sekund * 60 minut * 24 hodin = 1 den
+            //2.5.1
             //---------------------- Per-replikacia statistiky (inicialne) -----------------
             PocetVRadePredRontgenom1 = new WeightedStatisticsCollector();
             PocetVRadePredRontgenom2 = new WeightedStatisticsCollector();
@@ -109,7 +144,19 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             PocetVRadePredRontgenomSpolu = new WeightedStatisticsCollector();
             PocetVRadePredDetektoromSpolu = new WeightedStatisticsCollector();
             PocetVRadePredZberomSpolu = new WeightedStatisticsCollector();
-            CasVSystemeCollector = new StatisticsCollector();
+            PocetVPasPredRontgenom1 = new WeightedStatisticsCollector();
+            PocetVPasPredRontgenom2 = new WeightedStatisticsCollector();
+            PocetVPasPredRontgenomSpolu = new WeightedStatisticsCollector();
+            PocetVPasZaRontgenom1 = new WeightedStatisticsCollector();
+            PocetVPasZaRontgenom2 = new WeightedStatisticsCollector();
+            PocetVPasZaRontgenomSpolu = new WeightedStatisticsCollector();
+            CasVSystemeCollector              = new StatisticsCollector();
+            CasVRadePredRontgenomCollector    = new StatisticsCollector();
+            CasVRadePredDetektoromCollector   = new StatisticsCollector();
+            CasVRadePredZberomCollector       = new StatisticsCollector();
+            CasVPasPredRontgenomCollector     = new StatisticsCollector();
+            CasVPasZaRontgenomCollector       = new StatisticsCollector();
+            //2.5.1
             //---------------------- Globalne statistiky -----------------
             GlobalAvgRadPredRontgenom1 = new StatisticsCollector();
             GlobalAvgRadPredRontgenom2 = new StatisticsCollector();
@@ -120,7 +167,18 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             GlobalAvgRadPredRontgenomSpolu = new StatisticsCollector();
             GlobalAvgRadPredDetektoromSpolu = new StatisticsCollector();
             GlobalAvgRadPredZberomSpolu = new StatisticsCollector();
-            GlobalAvgCasVSysteme = new StatisticsCollector();
+            GlobalAvgPasPredRontgenom1 = new StatisticsCollector();
+            GlobalAvgPasPredRontgenom2 = new StatisticsCollector();
+            GlobalAvgPasPredRontgenomSpolu = new StatisticsCollector();
+            GlobalAvgPasZaRontgenom1 = new StatisticsCollector();
+            GlobalAvgPasZaRontgenom2 = new StatisticsCollector();
+            GlobalAvgPasZaRontgenomSpolu = new StatisticsCollector();
+            GlobalAvgCasVSysteme                  = new StatisticsCollector();
+            GlobalAvgCasVRadePredRontgenom        = new StatisticsCollector();
+            GlobalAvgCasVRadePredDetektorom       = new StatisticsCollector();
+            GlobalAvgCasVRadePredZberom           = new StatisticsCollector();
+            GlobalAvgCasVPasPredRontgenom         = new StatisticsCollector();
+            GlobalAvgCasVPasZaRontgenom           = new StatisticsCollector();
         }
 
         // Cas v sekundach, kedy sa v replikacii spusti EWarmupEnd a resetuju sa statistiky.
@@ -130,20 +188,32 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
         public int MaxPasPred { get; set; } = 4;
         public int MaxPasZa  { get; set; } = 5;
 
+        //2.5.1
         // Resetuje per-replikacne statistiky od aktualneho casu s aktualnymi hodnotami frontov.
         // Volane z EWarmupEnd.
         public void ResetPerReplicationStats()
         {
-            PocetVRadePredRontgenom1     = new WeightedStatisticsCollector();
-            PocetVRadePredRontgenom2     = new WeightedStatisticsCollector();
-            PocetVRadePredDetektorom1    = new WeightedStatisticsCollector();
-            PocetVRadePredDetektorom2    = new WeightedStatisticsCollector();
-            PocetVRadePredZberom1        = new WeightedStatisticsCollector();
-            PocetVRadePredZberom2        = new WeightedStatisticsCollector();
-            PocetVRadePredRontgenomSpolu    = new WeightedStatisticsCollector();
-            PocetVRadePredDetektoromSpolu   = new WeightedStatisticsCollector();
-            PocetVRadePredZberomSpolu       = new WeightedStatisticsCollector();
-            CasVSystemeCollector            = new StatisticsCollector();
+            PocetVRadePredRontgenom1      = new WeightedStatisticsCollector();
+            PocetVRadePredRontgenom2      = new WeightedStatisticsCollector();
+            PocetVRadePredDetektorom1     = new WeightedStatisticsCollector();
+            PocetVRadePredDetektorom2     = new WeightedStatisticsCollector();
+            PocetVRadePredZberom1         = new WeightedStatisticsCollector();
+            PocetVRadePredZberom2         = new WeightedStatisticsCollector();
+            PocetVRadePredRontgenomSpolu  = new WeightedStatisticsCollector();
+            PocetVRadePredDetektoromSpolu = new WeightedStatisticsCollector();
+            PocetVRadePredZberomSpolu     = new WeightedStatisticsCollector();
+            PocetVPasPredRontgenom1       = new WeightedStatisticsCollector();
+            PocetVPasPredRontgenom2       = new WeightedStatisticsCollector();
+            PocetVPasPredRontgenomSpolu   = new WeightedStatisticsCollector();
+            PocetVPasZaRontgenom1         = new WeightedStatisticsCollector();
+            PocetVPasZaRontgenom2         = new WeightedStatisticsCollector();
+            PocetVPasZaRontgenomSpolu     = new WeightedStatisticsCollector();
+            CasVSystemeCollector              = new StatisticsCollector();
+            CasVRadePredRontgenomCollector    = new StatisticsCollector();
+            CasVRadePredDetektoromCollector   = new StatisticsCollector();
+            CasVRadePredZberomCollector       = new StatisticsCollector();
+            CasVPasPredRontgenomCollector     = new StatisticsCollector();
+            CasVPasZaRontgenomCollector       = new StatisticsCollector();
 
             PocetVRadePredRontgenom1.AddWeightedValue(RadPredRontgenom1.Count, CurrentTime);
             PocetVRadePredRontgenom2.AddWeightedValue(RadPredRontgenom2.Count, CurrentTime);
@@ -157,10 +227,63 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
                 RadPredDetektorom1.Count + RadPredDetektorom2.Count, CurrentTime);
             PocetVRadePredZberomSpolu.AddWeightedValue(
                 RadPredZberomPrepraviek1.Count + RadPredZberomPrepraviek2.Count, CurrentTime);
+            PocetVPasPredRontgenom1.AddWeightedValue(Rontgen1.PocetPrepraviekPred, CurrentTime);
+            PocetVPasPredRontgenom2.AddWeightedValue(Rontgen2.PocetPrepraviekPred, CurrentTime);
+            PocetVPasPredRontgenomSpolu.AddWeightedValue(
+                Rontgen1.PocetPrepraviekPred + Rontgen2.PocetPrepraviekPred, CurrentTime);
+            PocetVPasZaRontgenom1.AddWeightedValue(Rontgen1.PocetPrepraviekZa, CurrentTime);
+            PocetVPasZaRontgenom2.AddWeightedValue(Rontgen2.PocetPrepraviekZa, CurrentTime);
+            PocetVPasZaRontgenomSpolu.AddWeightedValue(
+                Rontgen1.PocetPrepraviekZa + Rontgen2.PocetPrepraviekZa, CurrentTime);
+        }
+
+        public static string CsvObservationHeader =>
+            "Replikacia,ObsIndex,SimCas," +
+            "CasVSysteme,RadRontgenSpolu,RadDetektorSpolu,RadZberSpolu";
+
+        public static string CsvReplicationHeader =>
+            "Replikacia," +
+            "CasVSysteme,CasVRadePredRontgenom,CasVRadePredDetektorom,CasVRadePredZberom," +
+            "CasVPasPredRontgenom,CasVPasZaRontgenom," +
+            "RadRontgenSpolu,RadDetektorSpolu,RadZberSpolu,PasPredSpolu,PasZaSpolu";
+        //2.5.2
+        private void WriteReplicationRow()
+        {
+            if (CsvOutput == null) return;
+            static string F(double v) => v.ToString("F4", System.Globalization.CultureInfo.InvariantCulture);
+            CsvOutput.WriteLine(string.Join(",",
+                CurrentReplication,
+                F(CasVSystemeCollector.Average),
+                F(CasVRadePredRontgenomCollector.Average),
+                F(CasVRadePredDetektoromCollector.Average),
+                F(CasVRadePredZberomCollector.Average),
+                F(CasVPasPredRontgenomCollector.Average),
+                F(CasVPasZaRontgenomCollector.Average),
+                F(PocetVRadePredRontgenomSpolu.WeightedAverage),
+                F(PocetVRadePredDetektoromSpolu.WeightedAverage),
+                F(PocetVRadePredZberomSpolu.WeightedAverage),
+                F(PocetVPasPredRontgenomSpolu.WeightedAverage),
+                F(PocetVPasZaRontgenomSpolu.WeightedAverage)));
+        }
+        //2.5.2
+        internal void WriteObservationRow()
+        {
+            if (CsvOutput == null) return;
+            _obsIndex++;
+            static string F(double v) => v.ToString("F4", System.Globalization.CultureInfo.InvariantCulture);
+            CsvOutput.WriteLine(string.Join(",",
+                CurrentReplication,
+                _obsIndex,
+                F(CurrentTime),
+                F(CasVSystemeCollector.Average),
+                RadPredRontgenom1.Count + RadPredRontgenom2.Count,
+                RadPredDetektorom1.Count + RadPredDetektorom2.Count,
+                RadPredZberomPrepraviek1.Count + RadPredZberomPrepraviek2.Count));
         }
 
         protected override void BeforeSimulation() { }
 
+        //2.5.1
         protected override void BeforeReplication()
         {
             EventQueue = new PriorityQueue<Event, double>();
@@ -178,23 +301,37 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             RadPredZberomPrepraviek2 = new Queue<Cestujuci>();
             ZberPrepraviek1Volny     = true;
             ZberPrepraviek2Volny     = true;
-            TimeLimit = 60 * 60 * 24 + WarmupTime;
+            TimeLimit = SimDuration + WarmupTime;
             double firstArrival = GeneratorPrichodov.Generate();
             ScheduleEvent(new EPrichodCestujuceho(this, new Cestujuci(firstArrival, PocetCestujucich)), firstArrival);
             if (WarmupTime > 0)
                 ScheduleEvent(new EWarmupEnd(this), WarmupTime);
             if (Slowdown)
                 ScheduleEvent(new SleepEvent(this, Length), 0);
-            PocetVRadePredRontgenom1     = new WeightedStatisticsCollector();
-            PocetVRadePredRontgenom2     = new WeightedStatisticsCollector();
-            PocetVRadePredDetektorom1    = new WeightedStatisticsCollector();
-            PocetVRadePredDetektorom2    = new WeightedStatisticsCollector();
-            PocetVRadePredZberom1        = new WeightedStatisticsCollector();
-            PocetVRadePredZberom2        = new WeightedStatisticsCollector();
-            PocetVRadePredRontgenomSpolu    = new WeightedStatisticsCollector();
-            PocetVRadePredDetektoromSpolu   = new WeightedStatisticsCollector();
-            PocetVRadePredZberomSpolu       = new WeightedStatisticsCollector();
-            CasVSystemeCollector            = new StatisticsCollector();
+            _obsIndex = 0;
+            if (CollectInterval > 0)
+                ScheduleEvent(new ECollectData(this), CollectInterval);
+            PocetVRadePredRontgenom1      = new WeightedStatisticsCollector();
+            PocetVRadePredRontgenom2      = new WeightedStatisticsCollector();
+            PocetVRadePredDetektorom1     = new WeightedStatisticsCollector();
+            PocetVRadePredDetektorom2     = new WeightedStatisticsCollector();
+            PocetVRadePredZberom1         = new WeightedStatisticsCollector();
+            PocetVRadePredZberom2         = new WeightedStatisticsCollector();
+            PocetVRadePredRontgenomSpolu  = new WeightedStatisticsCollector();
+            PocetVRadePredDetektoromSpolu = new WeightedStatisticsCollector();
+            PocetVRadePredZberomSpolu     = new WeightedStatisticsCollector();
+            PocetVPasPredRontgenom1       = new WeightedStatisticsCollector();
+            PocetVPasPredRontgenom2       = new WeightedStatisticsCollector();
+            PocetVPasPredRontgenomSpolu   = new WeightedStatisticsCollector();
+            PocetVPasZaRontgenom1         = new WeightedStatisticsCollector();
+            PocetVPasZaRontgenom2         = new WeightedStatisticsCollector();
+            PocetVPasZaRontgenomSpolu     = new WeightedStatisticsCollector();
+            CasVSystemeCollector              = new StatisticsCollector();
+            CasVRadePredRontgenomCollector    = new StatisticsCollector();
+            CasVRadePredDetektoromCollector   = new StatisticsCollector();
+            CasVRadePredZberomCollector       = new StatisticsCollector();
+            CasVPasPredRontgenomCollector     = new StatisticsCollector();
+            CasVPasZaRontgenomCollector       = new StatisticsCollector();
             PocetVRadePredRontgenom1.AddWeightedValue(0, 0);
             PocetVRadePredRontgenom2.AddWeightedValue(0, 0);
             PocetVRadePredDetektorom1.AddWeightedValue(0, 0);
@@ -204,8 +341,15 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             PocetVRadePredRontgenomSpolu.AddWeightedValue(0, 0);
             PocetVRadePredDetektoromSpolu.AddWeightedValue(0, 0);
             PocetVRadePredZberomSpolu.AddWeightedValue(0, 0);
+            PocetVPasPredRontgenom1.AddWeightedValue(0, 0);
+            PocetVPasPredRontgenom2.AddWeightedValue(0, 0);
+            PocetVPasPredRontgenomSpolu.AddWeightedValue(0, 0);
+            PocetVPasZaRontgenom1.AddWeightedValue(0, 0);
+            PocetVPasZaRontgenom2.AddWeightedValue(0, 0);
+            PocetVPasZaRontgenomSpolu.AddWeightedValue(0, 0);
         }
 
+        //2.5.1
         protected override void AfterReplication()
         {
             PocetVRadePredRontgenom1.AddWeightedValue(0, CurrentTime);
@@ -217,6 +361,12 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             PocetVRadePredRontgenomSpolu.AddWeightedValue(0, CurrentTime);
             PocetVRadePredDetektoromSpolu.AddWeightedValue(0, CurrentTime);
             PocetVRadePredZberomSpolu.AddWeightedValue(0, CurrentTime);
+            PocetVPasPredRontgenom1.AddWeightedValue(0, CurrentTime);
+            PocetVPasPredRontgenom2.AddWeightedValue(0, CurrentTime);
+            PocetVPasPredRontgenomSpolu.AddWeightedValue(0, CurrentTime);
+            PocetVPasZaRontgenom1.AddWeightedValue(0, CurrentTime);
+            PocetVPasZaRontgenom2.AddWeightedValue(0, CurrentTime);
+            PocetVPasZaRontgenomSpolu.AddWeightedValue(0, CurrentTime);
 
             GlobalAvgRadPredRontgenom1.AddValue(PocetVRadePredRontgenom1.WeightedAverage);
             GlobalAvgRadPredRontgenom2.AddValue(PocetVRadePredRontgenom2.WeightedAverage);
@@ -227,7 +377,21 @@ namespace DIS_Semestralka_S2_Letisko.Letisko
             GlobalAvgRadPredRontgenomSpolu.AddValue(PocetVRadePredRontgenomSpolu.WeightedAverage);
             GlobalAvgRadPredDetektoromSpolu.AddValue(PocetVRadePredDetektoromSpolu.WeightedAverage);
             GlobalAvgRadPredZberomSpolu.AddValue(PocetVRadePredZberomSpolu.WeightedAverage);
+            GlobalAvgPasPredRontgenom1.AddValue(PocetVPasPredRontgenom1.WeightedAverage);
+            GlobalAvgPasPredRontgenom2.AddValue(PocetVPasPredRontgenom2.WeightedAverage);
+            GlobalAvgPasPredRontgenomSpolu.AddValue(PocetVPasPredRontgenomSpolu.WeightedAverage);
+            GlobalAvgPasZaRontgenom1.AddValue(PocetVPasZaRontgenom1.WeightedAverage);
+            GlobalAvgPasZaRontgenom2.AddValue(PocetVPasZaRontgenom2.WeightedAverage);
+            GlobalAvgPasZaRontgenomSpolu.AddValue(PocetVPasZaRontgenomSpolu.WeightedAverage);
             GlobalAvgCasVSysteme.AddValue(CasVSystemeCollector.Average);
+            GlobalAvgCasVRadePredRontgenom.AddValue(CasVRadePredRontgenomCollector.Average);
+            GlobalAvgCasVRadePredDetektorom.AddValue(CasVRadePredDetektoromCollector.Average);
+            GlobalAvgCasVRadePredZberom.AddValue(CasVRadePredZberomCollector.Average);
+            GlobalAvgCasVPasPredRontgenom.AddValue(CasVPasPredRontgenomCollector.Average);
+            GlobalAvgCasVPasZaRontgenom.AddValue(CasVPasZaRontgenomCollector.Average);
+
+            if (CollectInterval == 0)
+                WriteReplicationRow();
 
             RefreshGUI();
         }

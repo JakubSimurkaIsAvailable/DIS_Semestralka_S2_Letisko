@@ -32,6 +32,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Odchod
                     throw new Exception("Neplatny rad cestujuceho");
             }
 
+            simulacia.CasVRadePredZberomCollector.AddValue(
+                simulacia.CurrentTime - cestujuci.CasPrichoduPriZbere);
             simulacia.ScheduleEvent(new EZberPrepravky(simulacia, cestujuci), simulacia.CurrentTime);
             return simulacia.CurrentTime;
         }

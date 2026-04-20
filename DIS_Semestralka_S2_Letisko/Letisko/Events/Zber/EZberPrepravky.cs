@@ -53,12 +53,20 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Zber
                 if(p is not null && p.ID_Cestujuci == cestujuci.ID)
                 {
                     rontgen.PrepravkyZaRontgenom.Dequeue();
+                    simulacia.CasVPasZaRontgenomCollector.AddValue(
+                        simulacia.CurrentTime - p.CasUkonceniaRontgenu);
                     cestujuci.AktualnyPocetPrepraviek++;
+                    if (cestujuci.Rad == 0)
+                        simulacia.PocetVPasZaRontgenom1.AddWeightedValue(rontgen.PocetPrepraviekZa, simulacia.CurrentTime);
+                    else
+                        simulacia.PocetVPasZaRontgenom2.AddWeightedValue(rontgen.PocetPrepraviekZa, simulacia.CurrentTime);
+                    simulacia.PocetVPasZaRontgenomSpolu.AddWeightedValue(
+                        simulacia.Rontgen1.PocetPrepraviekZa + simulacia.Rontgen2.PocetPrepraviekZa, simulacia.CurrentTime);
                     if(rontgen.PrepravkyZaRontgenom.Count < rontgen.MaxAfter && rontgen.PrepravkyPredRontgenom.Count > 0 && rontgen.JeVolnyPrepravka)
                     {
                         rontgen.JeVolnyPrepravka = false;
                         Prepravka novaPrepravva = rontgen.PrepravkyPredRontgenom.Peek();
-                        simulacia.ScheduleEvent(new EZacniRontgen(simulacia, novaPrepravva, rontgen, cestujuci.Rad), simulacia.CurrentTime);
+                        simulacia.ScheduleEvent(new EZaciatokRontgen(simulacia, novaPrepravva, rontgen, cestujuci.Rad), simulacia.CurrentTime);
                     }
                 }
             }

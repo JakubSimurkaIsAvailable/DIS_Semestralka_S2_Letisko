@@ -11,6 +11,8 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Actors
     {
         public double CasPrichodu { get; private set; }
         public double CasPrichoduPriRontgen { get; private set; }
+        public double CasPrichoduPriDetektore { get; set; }
+        public double CasPrichoduPriZbere { get; set; }
         public double CasDovykladaniaPrepraviek { get; set; }
         public double CasNalozeniaPrepraviek { get; set; }
         public int Rad { get; private set; }

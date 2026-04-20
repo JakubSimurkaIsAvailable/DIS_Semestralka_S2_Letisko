@@ -38,6 +38,13 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
             {
                 throw new InvalidOperationException("Cestujuci na konci kontroly neni cestujuci na konci radu.");
             }
+            if (cestujuci.Rad == 0)
+                simulacia.PocetVRadePredDetektorom1.AddWeightedValue(radPredDetektorom.Count, simulacia.CurrentTime);
+            else
+                simulacia.PocetVRadePredDetektorom2.AddWeightedValue(radPredDetektorom.Count, simulacia.CurrentTime);
+            simulacia.PocetVRadePredDetektoromSpolu.AddWeightedValue(simulacia.RadPredDetektorom1.Count + simulacia.RadPredDetektorom2.Count, simulacia.CurrentTime);
+            simulacia.CasVRadePredDetektoromCollector.AddValue(
+                simulacia.CurrentTime - cestujuci.CasPrichoduPriDetektore);
             simulacia.ScheduleEvent(new EKoniecPrehliadkyDetektor(simulacia, cestujuci), casPrehliadky + simulacia.CurrentTime);
             return simulacia.CurrentTime;
         }

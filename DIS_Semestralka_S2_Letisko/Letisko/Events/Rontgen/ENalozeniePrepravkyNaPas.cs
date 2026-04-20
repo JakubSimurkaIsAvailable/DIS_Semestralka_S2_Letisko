@@ -36,6 +36,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
 
         private void VylozPrepravky(Cestujuci cestujuci, LetiskoSimulation simulacia, Objects.Rontgen rontgen)
         {
+            bool terminal1 = rontgen == simulacia.Rontgen1;
             int pocet = cestujuci.AktualnyPocetPrepraviek;
             for (int i = 0; i < pocet; i++)
             {
@@ -46,10 +47,16 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
                 if (rontgen.PridajPrepravku(prepravka))
                 {
                     cestujuci.AktualnyPocetPrepraviek--;
+                    if (terminal1)
+                        simulacia.PocetVPasPredRontgenom1.AddWeightedValue(rontgen.PocetPrepraviekPred, simulacia.CurrentTime);
+                    else
+                        simulacia.PocetVPasPredRontgenom2.AddWeightedValue(rontgen.PocetPrepraviekPred, simulacia.CurrentTime);
+                    simulacia.PocetVPasPredRontgenomSpolu.AddWeightedValue(
+                        simulacia.Rontgen1.PocetPrepraviekPred + simulacia.Rontgen2.PocetPrepraviekPred, simulacia.CurrentTime);
                 }
                 else
                 {
-                    break; // belt full — passenger waits
+                    break; 
                 }
             }
 
@@ -57,7 +64,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
             {
                 rontgen.JeVolnyPrepravka = false;
                 Prepravka prvaPrepravka = rontgen.PrepravkyPredRontgenom.Peek();
-                simulacia.ScheduleEvent(new EZacniRontgen(simulacia, prvaPrepravka, rontgen, cestujuci.Rad), simulacia.CurrentTime);
+                simulacia.ScheduleEvent(new EZaciatokRontgen(simulacia, prvaPrepravka, rontgen, cestujuci.Rad), simulacia.CurrentTime);
             }
 
             if (cestujuci.AktualnyPocetPrepraviek == 0)
@@ -65,8 +72,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
                 cestujuci.CasDovykladaniaPrepraviek = simulacia.CurrentTime;
                 simulacia.ScheduleEvent(new EOdchodCestujucehoRontgen(simulacia, cestujuci), simulacia.CurrentTime);
             }
-            // else: belt was full — passenger stays at head of RadPredRontgenom,
-            //       JeVolnyCestujuci stays false until ESkonciRontgen frees a slot
+
         }
     }
 }

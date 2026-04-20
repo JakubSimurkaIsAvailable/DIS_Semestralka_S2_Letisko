@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
 {
-    public class ESkonciRontgen : EventPrepravka
+    public class EKoniecRontgen : EventPrepravka
     {
         private Objects.Rontgen Rontgen;
         private int Terminal;
-        public ESkonciRontgen(LetiskoSimulation core, Prepravka actor, Objects.Rontgen rontgen, int terminal) : base(core, actor)
+        public EKoniecRontgen(LetiskoSimulation core, Prepravka actor, Objects.Rontgen rontgen, int terminal) : base(core, actor)
         {
                 this.Rontgen = rontgen;
                 this.Terminal = terminal;
@@ -45,23 +45,24 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Rontgen
 
             prepravka.CasUkonceniaRontgenu = simulacia.CurrentTime;
             Rontgen.PrepravkyZaRontgenom.Enqueue(prepravka);
+            if (Terminal == 0)
+                simulacia.PocetVPasZaRontgenom1.AddWeightedValue(Rontgen.PocetPrepraviekZa, simulacia.CurrentTime);
+            else
+                simulacia.PocetVPasZaRontgenom2.AddWeightedValue(Rontgen.PocetPrepraviekZa, simulacia.CurrentTime);
+            simulacia.PocetVPasZaRontgenomSpolu.AddWeightedValue(
+                simulacia.Rontgen1.PocetPrepraviekZa + simulacia.Rontgen2.PocetPrepraviekZa, simulacia.CurrentTime);
 
             if (Rontgen.PocetPrepraviekPred > 0 && Rontgen.PocetPrepraviekZa < Rontgen.MaxAfter)
             {
                 Prepravka dalsiaPrepravka = Rontgen.PrepravkyPredRontgenom.Peek();
-                simulacia.ScheduleEvent(new EZacniRontgen(simulacia, dalsiaPrepravka, Rontgen, Terminal), simulacia.CurrentTime);
+                simulacia.ScheduleEvent(new EZaciatokRontgen(simulacia, dalsiaPrepravka, Rontgen, Terminal), simulacia.CurrentTime);
             }
             else
             {
                 Rontgen.JeVolnyPrepravka = true;
             }
 
-            // belt before scanner freed one slot — unblock a waiting passenger if any
-            Queue<Cestujuci> radPredRontgenom = Terminal == 0 ? simulacia.RadPredRontgenom1 : simulacia.RadPredRontgenom2;
-            if (!Rontgen.JeVolnyCestujuci && radPredRontgenom.Count > 0 && radPredRontgenom.Peek().AktualnyPocetPrepraviek > 0)
-            {
-                simulacia.ScheduleEvent(new ENalozeniePrepravkyNaPas(simulacia, radPredRontgenom.Peek()), simulacia.CurrentTime);
-            }
+
 
             if(!zberVolny)
             {

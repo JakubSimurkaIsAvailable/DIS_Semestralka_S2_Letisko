@@ -67,6 +67,7 @@ namespace DIS_Semestralka_S2_Letisko.Letisko.Events.Detektor
             }
             if (cestujuci.MaxPocetPrepraviek > 0)
             {
+                cestujuci.CasPrichoduPriZbere = simulacia.CurrentTime;
                 if (cestujuci.Rad == 0)
                     simulacia.PocetVRadePredZberom1.AddWeightedValue(radPredZberomPrepraviek.Count, simulacia.CurrentTime);
                 else
